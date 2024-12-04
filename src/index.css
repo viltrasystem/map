@@ -1,0 +1,309 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* .text-gradient {
+    @apply bg-gradient-to-r from-blue-500 via-white-100 to-blue-600;
+  } */
+  /* input:-internal-autofill-selected */
+  input:-internal-autofill-selected {
+    appearance: none;
+    background-image: none !important;
+    background-color: transparent !important;
+    color: inherit !important;
+  }
+
+  .input-modified {
+    appearance: none;
+    background-image: none !important;
+    background-color: transparent !important;
+    color: inherit !important;
+  }
+
+  /* Custom CSS */
+  #inputField:focus + label,
+  #inputField:not(:placeholder-shown) + label {
+    top: -1rem;
+    font-size: 0.75rem;
+    color: #2a8639; /* Change this color to match your design */
+  }
+
+  .bg-logo {
+    color: rgba(2, 139, 255, 1);
+  }
+
+  .background-color {
+    background-color: rgba(2, 139, 255, 1);
+  }
+
+  .text-gradient {
+    background: linear-gradient(
+      to right,
+      rgb(30 150 255),
+      rgb(30 140 230),
+      rgb(30 120 220),
+      rgb(30 110 200)
+    );
+    background-clip: text;
+    -webkit-background-clip: text; /* For older webkit browsers */
+    color: transparent;
+  }
+
+  /* .background-gradient {
+    background: linear-gradient(
+      to right,
+      rgb(30 180 255),
+      rgb(20 140 220),
+      rgb(10 110 200),
+      rgb(0 100 180)
+    );
+  } */
+
+  .background-gradient {
+    background: linear-gradient(
+      to right,
+      rgb(30 150 255),
+      rgb(30 140 230),
+      rgb(30 120 220),
+      rgb(30 110 200)
+    );
+  }
+
+  /* region draw features */
+  .ol-tooltip {
+    position: relative;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    color: white;
+    padding: 4px 8px;
+    opacity: 0.7;
+    white-space: nowrap;
+    font-size: 12px;
+    cursor: default;
+    user-select: none;
+  }
+  .ol-tooltip-measure {
+    opacity: 1;
+    font-weight: bold;
+  }
+  .ol-tooltip-static {
+    background-color: #ffcc33;
+    color: black;
+    border: 1px solid white;
+    opacity: 0.5;
+  }
+  .ol-tooltip-measure:before,
+  .ol-tooltip-static:before {
+    border-top: 6px solid rgba(0, 0, 0, 0.5);
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    margin-left: -7px;
+    left: 50%;
+  }
+  .ol-tooltip-static:before {
+    border-top-color: #ffcc33;
+  }
+
+  .overlay {
+    position: absolute;
+    color: "rgba(0,0,0,0.6)";
+    font-size: 16px;
+    font-weight: 700;
+    pointer-events: none;
+    white-space: nowrap;
+    /* text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff, -2px 0 #fff,
+      0 2px #fff, 2px 0 #fff, 0 -2px #fff; */
+  }
+
+  /* input box icon color change*/
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield; /* Removes the spin buttons for Firefox */
+  }
+
+  /* Custom styling for the input box */
+  input[type="number"]::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1em;
+    height: 1em;
+    background-color: "#fff00"; /* Change this to the color you want */
+    pointer-events: none; /* Ensures the custom arrows don't block clicks */
+  }
+  /* end input box icon color change*/
+
+  /*  endregion draw features */
+
+  /* start Custom Scrollbar for light theme */
+  .slim-scroll {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #d1d5db transparent; /* Firefox */
+  }
+
+  .slim-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .slim-scroll::-webkit-scrollbar-thumb {
+    background-color: #d1d5db; /* Light gray */
+    border-radius: 9999px;
+  }
+
+  .slim-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Dark mode support */
+  .dark .slim-scroll::-webkit-scrollbar-thumb {
+    background-color: #4b5563; /* Darker gray for dark mode */
+  }
+  /* end Custom Scrollbar for light theme */
+  /* .image-enter {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  .image-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 500ms, transform 500ms;
+  }
+  .image-exit {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .image-exit-active {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 500ms, transform 500ms;
+  } */
+
+  /* styles.css */
+  /* toastify  custom style */
+  /* 
+  .Toastify__toast {
+    font-size: 12px; 
+    padding: 8px 16px; 
+    min-height: 40px; 
+    line-height: 1.4; 
+  }
+
+  .Toastify__toast-body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .Toastify__close-button {
+    width: 16px; 
+  }
+
+  .Toastify__progress-bar {
+    height: 3px; 
+  } */
+  /*  endregion  */
+}
+/* ,
+    rgb(59 130 200),
+      rgb(59 255 255),
+      rgb(59 210 240),
+      rgb(59 130 255)
+
+
+      rgb(238, 119, 36),
+      rgb(216, 54, 58),
+      rgb(221, 54, 117),
+      rgb(180, 69, 147) 
+      
+       rgb(30 180 255),
+      rgb(20 140 220),
+      rgb(10 110 200),
+      rgb(0 100 180)
+      initial
+       rgb(30 180 255),
+      rgb(20 160 220),
+      rgb(10 150 200),
+      rgb(0 140 180)
+      */
+/* :root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+} */

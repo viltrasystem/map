@@ -1,0 +1,91 @@
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.anleggsprojeksjonsflate; * geo data table but no data oreign table column found(kommunenummer, kommunenavn) ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.anleggsprojeksjonsflate;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.anleggsprojeksjonsflate;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.anleggsprojeksjonsgrense; * geo data table but no data ___ same no data
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.anleggsprojeksjonsgrense;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.anleggsprojeksjonsgrense;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.anleggsprojeksjonspunkt; * geo data table but no data __no content same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.anleggsprojeksjonspunkt;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.anleggsprojeksjonspunkt;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.anleggstypekode;  ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.anleggstypekode;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.anleggstypekode;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.annenmatrikkelenhetskode; * detail  ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.annenmatrikkelenhetskode;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.annenmatrikkelenhetskode;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.arealmerknadkode; * detail ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.arealmerknadkode;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.arealmerknadkode;
+lenhets
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.eiendomsgrense;  ** has map data   (add)
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.eiendomsgrense;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.eiendomsgrense;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.grensemerkenedsattikode;  * detail ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.grensemerkenedsattikode;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.grensemerkenedsattikode;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.grensepunkttypekode; * detail ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.grensepunkttypekode;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.grensepunkttypekode;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.hjelpelinje; ** has map data   (add)
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.hjelpelinje;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.hjelpelinje;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.hjelpelinjetypekode; detail ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.hjelpelinjetypekode;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.hjelpelinjetypekode;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.kommunenummer; ** no data ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.kommunenummer;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.kommunenummer;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.malemetode; * detail about map data, measuring details, how data taken , how draw etc many more  ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.malemetode;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.malemetode;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.matrikkelenhet; ** several detail column(cadastral unit) relasted column with table - matrikkelenhetstype, foreign table column found(kommunenummer) 
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.matrikkelenhet; *** __diferent data  (add)
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.matrikkelenhet;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.matrikkelenhetstype; * detail(cadastral unit type), land type ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.matrikkelenhetstype;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.matrikkelenhetstype;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.medium; * detail about letter meanings  ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.medium;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.medium;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.noyaktighetsklassekode; * detail about accuracy(accuracy class code) ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.noyaktighetsklassekode;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.noyaktighetsklassekode;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.noyaktighetsklasseteigkode; * detail about light green, yellow, red(accuracy class dough code)  ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.noyaktighetsklasseteigkode;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.noyaktighetsklasseteigkode;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.teig; * map data  points(teig), foreign table column found(kommunenummer, kommunenavn)  (add)
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.teig;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.teig;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.teig_arealmerknad; * detail about places, borders etc(teig area notice) __differentid foreign key from teig (add)
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.teig_arealmerknad;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.teig_arealmerknad;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.teiggrensepunkt; *dough limit point (add)
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.teiggrensepunkt;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.teiggrensepunkt;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.terrengdetaljkode; *  terrain detail code ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.terrengdetaljkode;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.terrengdetaljkode;
+
+select * from  matrikkeleneiendomskartteig_aeacb4d5a86446d49879180c9e1f7795.administrativgrensekode; * administrative boundary code ___same
+select * from  matrikkeleneiendomskartteig_2e80622b9c6c4e28b408d88a26fc2199.administrativgrensekode;
+select * from  matrikkeleneiendomskartteig_b7a02dda941e4095a7f767e0bc0fe0d6.administrativgrensekode;

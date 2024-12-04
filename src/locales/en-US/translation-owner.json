@@ -1,0 +1,21 @@
+{
+  "title": "Manage Land Owner",
+  "lbl_multiple_owner_land_owner_detail": "Contact person for multiple owned land",
+  "select_land_owner": "Land Owner",
+  "land_owner": "Select Land Owner",
+  "full_name": "Full Name",
+  "email": "Email",
+  "contact_number": "Contact Number",
+  "address_line1": "Address Line1",
+  "address_line2": "Address Line2",
+  "address_city": "Address City",
+  "bank_account_no": "Bank Account No",
+  "notes": "Notes",
+  "btn_submit": "Save",
+  "msg_save_success": "Successfully updated !",
+  "msg_save_error.Text": "Error occurred while updating details !",
+  "msg_new_contact_saved_successfully": "New contact person for the multiple land is registered !",
+  "msg_land_owner_details_exist": "some land owner details already exist with current user {{landOwner}} and you can add/edit and save as necessary with selected user {{selectedLandOwner}}",
+  "msg_shared_land_owner_exist_detail_same": "Do you wish to save new contact person {{name}} and keep the origin bank account or address ?",
+  "msg_shared_land_owner_exist": "Land contact owner details exist with user {{landOwner}}, Do you want to add user {{selectedLandOwner}} as contact person ?"
+}

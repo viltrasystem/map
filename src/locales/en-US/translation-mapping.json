@@ -1,0 +1,10 @@
+{
+  "title": "Loading Property",
+  "different_user": "The currently log in user, {{name}} in map system different from login user of main environemnt.",
+  "login_request": "Do you need to log out and login as main environment user ?",
+  "invalid_request": "The request has some invalid data which prevent from further processing...",
+  "close_request": "Close the tab & contact administrator",
+  "user_unit_different": "Requested User unit is different from current login user Registered Unit/s",
+  "user_unit_invalid": "This may be invalid request, Log out & try again or check the url, if error persist, please contact administation",
+  "request_not_found": "The requested URL was not found on this server"
+}

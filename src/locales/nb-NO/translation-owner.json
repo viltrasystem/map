@@ -1,0 +1,21 @@
+{
+  "title": "Legg til / rediger kontaktinfo",
+  "lbl_multiple_owner_land_owner_detail": "Kontaktperson for sameie",
+  "land_owner": "Velg grunneier",
+  "select_land_owner": "Grunneier",
+  "full_name": "Navn",
+  "email": "E-post",
+  "contact_number": "Mobiltelefon",
+  "address_line1": "Adresse",
+  "address_line2": "Postnummer",
+  "address_city": "Poststed",
+  "bank_account_no": "Bankkontonummer",
+  "notes": "Merknader",
+  "btn_submit": "Lagre",
+  "msg_save_success": "Vellykket oppdatert !",
+  "msg_save_error.Text": "En feil oppstod under oppdateringen av detaljene !",
+  "msg_new_contact_saved_successfully": "Ny kontaktperson er registrert.",
+  "msg_land_owner_details_exist": "Se gjennom opplysningene som er registrert på {{landOwner}} og endre disse om nødvendig {{selectedLandOwner}}.",
+  "msg_shared_land_owner_exist_detail_same": "Ønsker du å lagre {{name}} som ny kontaktperson og beholde de opprinnelige opplysningene om kontonummer, adresse m.m.?",
+  "msg_shared_land_owner_exist": "Nåværende kontaktperson er {{landOwner}}. Ønsker du å registrere {{selectedLandOwner}} som ny kontaktperson for eiendommen?"
+}

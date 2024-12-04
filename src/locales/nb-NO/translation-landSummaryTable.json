@@ -1,0 +1,19 @@
+{
+  "land_id": "LandId *",
+  "municipality": "Municipality",
+  "main_no": "Main No",
+  "sub_no": "Sub No",
+  "land_owner_names": "land Owner Names",
+  "land_owned_units": "land Owned Units",
+  "plot_no": "Plot No",
+  "area_in_forest": "Area In Forest",
+  "area_in_mountain": "Area In Mountain",
+  "area_in_agriculture": "Area In Agriculture",
+  "total_area": "Total Area",
+  "notes": "notes",
+  "no_data": "No land related data available",
+  "edit": "Edit",
+  "delete": "Delete",
+  "map": "Map",
+  "land_archive_confirm": "Er du sikker på at du vil fjerne den valgte eiendommen/teigen?"
+}

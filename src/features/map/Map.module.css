@@ -1,0 +1,39 @@
+.map {
+  @apply w-full h-full relative;
+}
+
+.popup {
+  @apply absolute bg-white shadow-md p-4 rounded border border-gray-300 bottom-4 left-[-50px] min-w-[280px];
+}
+
+.popup:after,
+.popup:before {
+  @apply absolute pointer-events-none;
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+}
+
+.popup:after {
+  border-top-color: red;
+  border-width: 10px;
+  left: 48px;
+  margin-left: -10px;
+}
+
+.popup:before {
+  border-top-color: gray-300;
+  border-width: 11px;
+  left: 48px;
+  margin-left: -11px;
+}
+
+.popupCloser {
+  @apply absolute top-2 right-8 no-underline;
+}
+
+.popupCloser:after {
+  content: "✖";
+}
