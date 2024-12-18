@@ -486,3 +486,22 @@ export const GeoJsonToFeatureConverter = (
 
   return list;
 };
+
+export const addMetersToCoordinates = (
+  lat: number,
+  lon: number,
+  meters: number,
+  seconds: number
+) => {
+  // 1 degree of latitude is approximately 111320 meters
+  const latitudeChange = meters / 111320;
+
+  // For longitude, adjust for the current latitude
+  const longitudeChange = meters / (111320 * Math.cos((lat * Math.PI) / 180));
+
+  // Add the change in coordinates (in degrees)
+  const newLat = lat + latitudeChange * seconds;
+  const newLon = lon + longitudeChange * seconds;
+
+  return { newLat, newLon };
+};

@@ -1,11 +1,12 @@
 import axios, { AxiosError } from "axios";
-import {
-  OwnedLand,
-  OwnerDetailReq,
-  SharedLand,
-} from "../slices/landOwnersSlice";
+import { OwnerDetailReq, SharedLand } from "../slices/landOwnersSlice";
 import { ArchiveInfo, LandUnitInfo } from "../slices/landSummarySlice";
-import { ILandOwnerSchema, ManageLand, MultipleLandOwner } from "../lib/types";
+import {
+  ILandOwnerSchema,
+  ManageLand,
+  MultipleLandOwner,
+  OwnedLand,
+} from "../lib/types";
 import { LandDetailReq } from "../features/land/LandDetail";
 import apiClient from "./apiClient";
 

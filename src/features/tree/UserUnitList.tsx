@@ -10,7 +10,7 @@ import { RootState } from "../../app/store";
 const UserUnitList: React.FC = () => {
   const { user } = useAppSelector((state: RootState) => state.auth);
   const { rootUnitId, error } = useAppSelector((state) => state.unitTree);
-  const userUnit = useAppSelector((state) => state.userUnit);
+  const { userUnitList } = useAppSelector((state) => state.userUnit);
   const { rootNodeSelect } = useUserUnit();
   const dispatch = useAppDispatch();
   const userUnitInitialState = useMemo(() => {
@@ -74,7 +74,7 @@ const UserUnitList: React.FC = () => {
   };
 
   useEffect(() => {
-    const defaultUnits: UserUnit[] | undefined = userUnit?.filter(
+    const defaultUnits: UserUnit[] | undefined = userUnitList.filter(
       (unit: UserUnit) => unit.IsMainUnit
     );
 

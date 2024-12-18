@@ -1,9 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import landApi from "../services/landApi";
 import { setLoadingState } from "../slices/loadingSlice";
-import { OwnedLand } from "../slices/landOwnersSlice";
 import { ArchiveInfo } from "../slices/landSummarySlice";
-import { ApiResponse, ErrorState } from "../lib/types";
+import { ApiResponse, ErrorState, OwnedLand } from "../lib/types";
 import axios from "axios";
 
 // Action type constants
@@ -23,7 +22,6 @@ export const landSummary = createAsyncThunk<
       return { noContent: true };
     }
     dispatch(setLoadingState(false));
-    console.log(landReq.locale);
     return { data: response, locale: landReq.locale };
   } catch (error) {
     dispatch(setLoadingState(false));

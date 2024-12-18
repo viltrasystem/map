@@ -51,17 +51,22 @@ const treeSlice = createSlice({
   name: "tree",
   initialState: initialState,
   reducers: {
-    setSelectedRootUnitId: (state, action: PayloadAction<number>) => {
-      state.selectedRootUnitId = action.payload;
-    },
-    setSelectedRootNode(state, action: PayloadAction<NodeData>) {
-      state.rootNode = action.payload;
-      state.selectedNode = undefined;
+    setRootNodeAndRootId(state, action: PayloadAction<NodeData>) {
+      return {
+        ...state,
+        rootNode: action.payload,
+        selectedRootUnitId: action.payload.UnitID,
+        selectedNode: action.payload,
+      };
     },
     setSelectedNode(state, action: PayloadAction<number>) {
       const unitId = Number(action.payload);
+      const selectedNode = findObjectById(state.rootNode, unitId);
 
-      state.selectedNode = findObjectById(state.rootNode, unitId);
+      return {
+        ...state,
+        selectedNode,
+      };
     },
     setNodeExpandStatus(
       state,
@@ -69,9 +74,18 @@ const treeSlice = createSlice({
     ) {
       const { unitId, isExpand } = action.payload;
       if (state.rootNode.Children === undefined) {
-        state.rootNode.IsExpanded = isExpand;
+        return {
+          ...state,
+          rootNode: {
+            ...state.rootNode,
+            IsExpanded: isExpand,
+          },
+        };
       } else {
-        state.rootNode = updateExpandStatus(state.rootNode, unitId, isExpand);
+        return {
+          ...state,
+          rootNode: updateExpandStatus(state.rootNode, unitId, isExpand),
+        };
       }
     },
     setChildNodes(state, action: PayloadAction<NodeData[]>) {
@@ -83,18 +97,29 @@ const treeSlice = createSlice({
           parentId,
           newChildren
         );
-        state.rootNode.Children = newState;
+        return {
+          ...state,
+          rootNode: {
+            ...state.rootNode,
+            Children: newState,
+          },
+        };
       } else {
-        state.rootNode.Children = newChildren;
-        state.rootNode.IsExpanded = true;
+        return {
+          ...state,
+          rootNode: {
+            ...state.rootNode,
+            Children: newChildren,
+            IsExpanded: true,
+          },
+        };
       }
     },
   },
 });
 
 export const {
-  setSelectedRootUnitId,
-  setSelectedRootNode,
+  setRootNodeAndRootId,
   setSelectedNode,
   setNodeExpandStatus,
   setChildNodes,

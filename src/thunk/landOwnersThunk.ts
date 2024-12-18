@@ -1,12 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import landApi from "../services/landApi";
 import { setLoadingState } from "../slices/loadingSlice";
-import {
-  LandOwnersObj,
-  OwnedLand,
-  SharedLand,
-} from "../slices/landOwnersSlice";
-import { ApiResponse } from "../lib/types";
+import { LandOwnersObj, SharedLand } from "../slices/landOwnersSlice";
+import { ApiResponse, OwnedLand } from "../lib/types";
 import axios from "axios";
 // Action type constants
 const LANDOWNERS = "LANDOWNERS";
@@ -19,11 +15,6 @@ export const landOwners = createAsyncThunk(
       // if (response.status === 204) {
       //   return { noContent: true };
       // }
-      //   const currentRowsHeight =
-      //     response.data?.LandInformations != null
-      //       ? 4 + response.data?.LandInformations.length * 10
-      //       : 0;
-      //   const initialHeight = currentRowsHeight > 20 ? 20 : currentRowsHeight;
       dispatch(setLoadingState(false));
       return { data: response as LandOwnersObj, locale: landReq.locale };
     } catch (error) {
@@ -49,37 +40,6 @@ export const landOwners = createAsyncThunk(
   }
 );
 
-// export const ownersLand = createAsyncThunk(
-//   LANDOWNERS,
-//   async (ownedLand: OwnedLand, { rejectWithValue, dispatch }) => {
-//     try {
-//       const response = await landApi.ownersLand(ownedLand);
-//       if (response.status === 204) {
-//         return { noContent: true };
-//       }
-//       //   const currentRowsHeight =
-//       //     response.data?.LandInformations != null
-//       //       ? 4 + response.data?.LandInformations.length * 10
-//       //       : 0;
-//       //   const initialHeight = currentRowsHeight > 20 ? 20 : currentRowsHeight;
-//       dispatch(setLoadingState(false));
-//       return response;
-//     } catch (err) {
-//       dispatch(setLoadingState(false));
-//       if (!err.response) {
-//         throw err;
-//       }
-//       if (err.response.status === 404) {
-//         return rejectWithValue({
-//           notFound: true,
-//           message: err.response.data,
-//         });
-//       }
-//       return rejectWithValue(err.response.data);
-//     }
-//   }
-// );
-
 export const sharedOwnersLand = createAsyncThunk(
   LANDOWNERS,
   async (sharedLand: SharedLand, { rejectWithValue, dispatch }) => {
@@ -88,11 +48,6 @@ export const sharedOwnersLand = createAsyncThunk(
       if (response.status === 204) {
         return { noContent: true };
       }
-      //   const currentRowsHeight =
-      //     response.data?.LandInformations != null
-      //       ? 4 + response.data?.LandInformations.length * 10
-      //       : 0;
-      //   const initialHeight = currentRowsHeight > 20 ? 20 : currentRowsHeight;
       dispatch(setLoadingState(false));
       return response;
     } catch (error) {

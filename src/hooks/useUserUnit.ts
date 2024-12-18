@@ -6,10 +6,10 @@ import { RootState } from "../app/store";
 
 const useUserUnit = () => {
   const dispatch = useAppDispatch();
-  const userUnit = useAppSelector((state) => state.userUnit);
+  const { userUnitList } = useAppSelector((state) => state.userUnit);
   const { user } = useAppSelector((state: RootState) => state.auth);
   const rootNodeSelect = (unitId: number) => {
-    const selectedUnit: UserUnit = userUnit.find(
+    const selectedUnit: UserUnit = userUnitList.find(
       (obj) => obj.UnitID === unitId
     )!;
 

@@ -10,8 +10,8 @@ import { useAppDispatch, useAppSelector } from "../../app/hook";
 import { useGetChildUnitsQuery } from "../../services/treeApi";
 //import { createPopper } from "@popperjs/core";
 import { usePopper } from "react-popper";
-import { RootState } from "../../app/store";
-import { setSummaryUnit } from "../../slices/summarySlice";
+import store, { RootState } from "../../app/store";
+import { setSelectedTab } from "../../slices/tabSelectionSlice";
 
 const initialContextMenu = {
   isOpen: false,
@@ -126,14 +126,12 @@ const Node: React.FC<NodeProps> = ({ label, unitId }) => {
   useEffect(() => {
     console.log("node.tsx:", shouldFetchData);
     if (fetchedChildUnits && !isLoading && !error) {
-      // console.log("Dispatching setChildNodes", fetchedChildUnits);
       if (
         fetchedChildUnits.length > 0 &&
         CurUnitID &&
         CurUnitID !== 0 &&
         fetchedChildUnits[0].ParentID === CurUnitID
       ) {
-        // console.log("Dispatching setChildNodes run", fetchedChildUnits);
         dispatch(setChildNodes(fetchedChildUnits)); //after fetching set child nodes
       }
       // Reset shouldFetchData after fetching data
@@ -155,13 +153,9 @@ const Node: React.FC<NodeProps> = ({ label, unitId }) => {
     const id = event.currentTarget.id;
     if (id) {
       dispatch(setSelectedNode(Number(id)));
-      dispatch(
-        setSummaryUnit({
-          unitId: Number(id),
-          summaryType: "land", //but select according to land tab selected state
-        })
-      );
-      console.log("unit selected:", id);
+
+      if (store.getState().tabSelection.selectedTab === "selectedLand")
+        dispatch(setSelectedTab("land"));
     } else {
       console.log("error occured");
     }
@@ -204,22 +198,6 @@ const Node: React.FC<NodeProps> = ({ label, unitId }) => {
           <span className="cursor-pointer">{label}</span>
         </div>
       </div>
-      {/* {isOpen && (
-        <div
-          style={{
-            visibility: isOpen ? "visible" : "hidden",
-            backgroundColor: "white",
-            border: "1px solid #ccc",
-            padding: "5px",
-          }}
-        >
-          <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-            <li onClick={closeMenu}>Menu Item 1</li>
-            <li onClick={closeMenu}>Menu Item 2</li>
-            <li onClick={closeMenu}>Menu Item 3</li>
-          </ul>
-        </div>
-      )} */}
       {node?.UnitTypeID != 6 &&
         rootNode?.UnitTypeID != 0 &&
         contextMenu.isOpen && (

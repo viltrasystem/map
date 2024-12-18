@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "../ui/Header";
 import SideBar, { PrintInfo } from "../ui/SideBar";
 import { Outlet } from "react-router-dom";
-import { setSelectedRootUnitId } from "../slices/treeSlice";
 import { useAppDispatch, useAppSelector } from "../app/hook";
 import { useGetUserUnitsQuery } from "../services/userUnitApi";
-import { UserUnit, setUserUnitList } from "../slices/userUnitSlice";
+import { setUserUnitList } from "../slices/userUnitSlice";
 import store, { RootState, persistor } from "../app/store";
 import { MapWrapperRef } from "../features/map/MapWrapper";
 import { AppProvider } from "../context/AppContext";
@@ -14,31 +13,49 @@ import { logout } from "../thunk/authThunk";
 import RequestValidation from "./RequestValidation";
 import { useTranslation } from "react-i18next";
 import { setSideBarVisibility } from "../slices/sideBarSlice";
+import { selectRootNode } from "../lib/selectRootNode";
 
 const AppLayout = () => {
   const { token, user } = useAppSelector((state: RootState) => state.auth);
   const dispatch = useAppDispatch();
-  const { rootId, unitId } = useAppSelector(
-    (state: RootState) => state.mapping
+  const { rootId } = useAppSelector(
+    (state: RootState) => ({ rootId: state.mapping.rootId }),
+    (prev, next) => prev.rootId === next.rootId
   );
 
   const { t } = useTranslation();
-  const [isUserUnitAvailable, setIsUserUnitAvailable] = useState(true);
+  const [IsUserUnitAvailable, setIsUserUnitAvailable] = useState(true);
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const mapWrapperRef = useRef<MapWrapperRef>(null);
   const isSidebarShowRef = useRef<boolean>(true);
 
   const sidebarVisible = useRef(true);
+  console.log("appLayout...............................");
+
+  const {
+    data: fetchedUserUnits,
+    isLoading: isFetchedUserUnits,
+    isError,
+    error,
+  } = useGetUserUnitsQuery(
+    {
+      dnnUserId: user.UserId,
+      isAdmin: user.IsAdmin,
+    },
+    {
+      skip: store.getState().userUnit.userUnitList.length > 0,
+    }
+  );
 
   useEffect(() => {
     const updateSidebarVisibility = () => {
-      if (window.innerWidth > 1920) {
+      if (window.innerWidth > 1280) {
         handleSidebarToggle(true);
-        setSideBarVisibility(true);
+        dispatch(setSideBarVisibility(true));
       } else {
         handleSidebarToggle(false);
-        setSideBarVisibility(false);
+        dispatch(setSideBarVisibility(false));
       }
       console.log("Sidebar visibility:", sidebarVisible.current);
     };
@@ -47,7 +64,7 @@ const AppLayout = () => {
     return () => {
       window.removeEventListener("resize", updateSidebarVisibility);
     };
-  }, []);
+  }, [dispatch]);
 
   const logoutRequest: LogoutRequest = {
     UserId: user.UserId,
@@ -63,94 +80,73 @@ const AppLayout = () => {
     persistor.purge(); // Clears the persisted storage
   };
 
-  const userUnitInitialState = useMemo(() => {
-    const initialState: UserUnit = {
-      UnitID: 0,
-      Unit: "",
-      UnitTypeID: 0,
-      ReferenceID: "",
-      ImgUrl: "",
-      ParentUnit: "",
-      ChildCount: 0,
-      ChildTeamsCount: 0,
-      IsActiveForHunting: false,
-      IsHuntingComplete: false,
-      IsArchived: false,
-      IsAllowedToRegisterLands: false,
-      IsMainUnit: false,
-      IsMunicipalityUser: false,
-      IsExporter: false,
-      IsPriceUser: false,
-      IsLandAssignableUser: false,
-      IsLandOwner: false,
-      IsReporter: false,
-      IsHead: false,
-      IsGuest: false,
-      IsHuntingPolice: false,
-    };
-    return initialState;
-  }, []);
-
-  const {
-    data: fetchedUserUnits,
-    isLoading: isFetchedUserUnits,
-    isError,
-    error,
-  } = useGetUserUnitsQuery(
-    {
-      dnnUserId: user.UserId,
-      isAdmin: user.IsAdmin,
-    },
-    {
-      skip:
-        store.getState().tree.rootNode != null &&
-        store.getState().tree.rootNode.UnitID > 0 &&
-        rootId === 0, // if data exists/not open from mapping no need to fetch or reset(while refresh)
-    }
-  );
-
   useEffect(() => {
-    if (!isFetchedUserUnits && fetchedUserUnits) {
+    if (store.getState().userUnit.userUnitList.length === 0) {
+      if (!isFetchedUserUnits && fetchedUserUnits) {
+        if (rootId > 0) {
+          console.log(rootId);
+          const isUserUnitAvailable = fetchedUserUnits.some(
+            (userUnit) => userUnit.UnitID === rootId
+          );
+
+          if (isUserUnitAvailable) {
+            dispatch(async (dispatch, getState) => {
+              const state = getState();
+              console.log(state.userUnit.userUnitList);
+              dispatch(setUserUnitList(fetchedUserUnits));
+
+              const userUnits = state.userUnit.userUnitList; // Adjust according to your Redux slice
+              const rootNodeExists = userUnits.some(
+                (unit) => unit.UnitID === rootId
+              );
+
+              if (rootNodeExists) {
+                selectRootNode(rootId, userUnits, user, dispatch);
+              }
+            });
+          } else {
+            setIsUserUnitAvailable(false);
+          }
+        } else {
+          dispatch(async (dispatch, getState) => {
+            dispatch(setUserUnitList(fetchedUserUnits));
+
+            const defaultUnits = fetchedUserUnits.filter(
+              (unit) => unit.IsMainUnit
+            );
+            const defaultUnit = defaultUnits[0] || fetchedUserUnits[0];
+            const state = getState();
+            const userUnits = state.userUnit.userUnitList;
+            if (userUnits.length > 0 && defaultUnit) {
+              selectRootNode(defaultUnit.UnitID, userUnits, user, dispatch);
+            }
+          });
+        }
+      }
+    } else {
       if (rootId > 0) {
-        const isUserUnitAvailable = fetchedUserUnits.find(
-          (userUnit) => userUnit.UnitID === rootId
-        );
+        const isUserUnitAvailable = store
+          .getState()
+          .userUnit.userUnitList.find((userUnit) => userUnit.UnitID === rootId);
         if (isUserUnitAvailable) {
-          dispatch(setUserUnitList(fetchedUserUnits));
-          dispatch(setSelectedRootUnitId(rootId));
+          selectRootNode(
+            rootId,
+            store.getState().userUnit.userUnitList,
+            user,
+            dispatch
+          );
         } else {
           setIsUserUnitAvailable(false);
         }
-      } else {
-        dispatch(setUserUnitList(fetchedUserUnits));
-        const defaultUnits: UserUnit[] | undefined = fetchedUserUnits?.filter(
-          (unit: UserUnit) => unit.IsMainUnit
-        );
-        const defaultUnit = defaultUnits
-          ? defaultUnits[0]
-          : fetchedUserUnits
-          ? fetchedUserUnits[0]
-          : userUnitInitialState;
-        if (defaultUnit) dispatch(setSelectedRootUnitId(defaultUnit.UnitID));
       }
-    }
-
-    const sidebar = sidebarRef.current;
-    const button = buttonRef.current;
-    if (sidebar && button) {
-      sidebar.style.gridTemplateColumns = "18rem 1fr";
-      button.innerHTML = `<svg class="" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2"/>
-</svg>`;
     }
   }, [
     isFetchedUserUnits,
+    user,
     fetchedUserUnits,
-    userUnitInitialState,
     isError,
     error,
     rootId,
-    unitId,
     dispatch,
   ]);
 
@@ -225,7 +221,7 @@ const AppLayout = () => {
 
   const contextValue = { handleSidebarToggle, handlePrintMap, mapWrapperRef };
 
-  if (!isUserUnitAvailable) {
+  if (!IsUserUnitAvailable) {
     return (
       <div>
         <RequestValidation
@@ -256,7 +252,7 @@ const AppLayout = () => {
             />
           </div>
           <div className="flex relative">
-            <div className="absolute top-[2px] left-[6px]  z-10">
+            <div className="absolute top-[1px] left-[6px]  z-10">
               <button
                 className="rounded-full p-[4px] w-8 h-8 flex items-center justify-center text-gray-800  hover:text-gray-100 hover:bg-gray-400  hover:ring-gray-600
         dark:text-tblColora  dark:hover:text-gray-800 dark:hover:bg-gray-400 dark:focus:ring-gray-800  dark:hover:ring-gray-600  transition duration-300"

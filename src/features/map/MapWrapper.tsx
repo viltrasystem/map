@@ -25,23 +25,11 @@ import { Fill, Icon, Text } from "ol/style";
 import LayerSelection from "../../ui/LayerSelection";
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
-import { LiaTreeSolid } from "react-icons/lia";
 import { Draw, Modify, Select } from "ol/interaction";
-import { Geometry, LineString, Polygon } from "ol/geom";
+import { Circle, Geometry, LineString, Polygon } from "ol/geom";
 import CircleStyle from "ol/style/Circle";
 import { unByKey } from "ol/Observable";
 import { DrawEvent } from "ol/interaction/Draw";
-import ReactDOMServer from "react-dom/server"; // Import react-dom/server
-import { HiLocationMarker } from "react-icons/hi";
-import { FaTree } from "react-icons/fa";
-import { RxCross1 } from "react-icons/rx";
-import { MdFence, MdOutlineGrass } from "react-icons/md";
-import { TbPoint } from "react-icons/tb";
-import { GiCow } from "react-icons/gi";
-import { LuTreeDeciduous } from "react-icons/lu";
-import { GiHut } from "react-icons/gi";
-import { RxHome } from "react-icons/rx";
-import { FaRegCircle } from "react-icons/fa";
 import {
   adjustCenter,
   colorToHex,
@@ -67,15 +55,18 @@ import UserLocate from "../../ui/UserLocate";
 import ZoomIn from "../../ui/ZoomIn";
 import ZoomOut from "../../ui/ZoomOut";
 import "ol/ol.css";
-import Spinner from "../../ui/Spinner";
 import { setLoadingState } from "../../slices/loadingSlice";
 import ToporasterLayer from "../layers/ToporasterLayer";
 import SjokartrasterLayer from "../layers/SjokartrasterLayer";
 import TopoLayer from "../layers/TopoLayer";
 import createVectorLayer from "../layers/createVectorLayer";
 import TopograatoneLayer from "../layers/TopograatoneLayer";
+import OSMLayer from "../layers/OSMLayer";
 import { PrintInfo } from "../../ui/SideBar";
 import { click } from "ol/events/condition";
+import { setSideBarVisibility } from "../../slices/sideBarSlice";
+import { getFeatureStyle, getAccuracyStyle } from "../../lib/featureStyle";
+import SpinnerMini from "../../ui/SpinnerMini";
 
 type MapWrapperProps = {};
 export interface MapWrapperRef {
@@ -84,31 +75,25 @@ export interface MapWrapperRef {
   CancelDownloadMap: () => void;
   mapToolToggle: (height: number) => void;
   mapLayerChange: () => void;
+  mapMarkerRemove: () => void;
   mapUnitLayerChange: () => void;
   // TooltipClose: () => void;
 }
 
-const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
-  (props, ref) => {
+const MapWrapper = React.memo(
+  forwardRef<MapWrapperRef, MapWrapperProps>((props, ref) => {
     console.log(props); //*** */
     const mapRef = useRef<HTMLDivElement>(null); // Ref for the map container
     const overlaysRef = useRef<Overlay[]>([]);
     const markerRef = useRef<Feature<Geometry> | null>(null);
     const mapToolRef = useRef<HTMLDivElement>(null);
     const overlayRef = useRef<HTMLDivElement | null>(null);
-    //const overlayArray = useRef([]); // Maintain an array of overlays
     const popupRef = useRef<HTMLDivElement>(null);
     const closerRef = useRef<HTMLAnchorElement>(null);
-    // const [isLoading, setIsLoading] = useState(false);
-    // const [isPopUpShow, setIsPopUpShow] = useState(false);
-    //const [lastFeature, setLastFeature] = useState<Feature | null>(null);
     const dispatch = useAppDispatch();
-    const mapCenter = useAppSelector(
-      (state: RootState) => state.mapFeature.mapCenter
+    const { selectedTab } = useAppSelector(
+      (state: RootState) => state.tabSelection
     );
-
-    //dispatch(fetchUserDrawnFeatures()); // get saved user defined features ***(here can be used to retrive data which appropriate to user belongs to area)
-
     const { savedFeatures, isLoading: isSavedFeaturesLoading } = useAppSelector(
       (state: RootState) => state.mapSavedFeature
     );
@@ -120,12 +105,12 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
     ); //corresponds to ETRS89 / UTM zone 32N. The EPSG code 25832 represents this specific UTM zone, which covers northern Europe.
     register(proj4);
 
-    //const osmLayer = useMemo(() => OSMLayer(), []);
     const vectorLayer = useMemo(() => createVectorLayer(), []);
     const toporasterLayer = useMemo(() => ToporasterLayer(), []);
     const sjokartrasterLayer = useMemo(() => SjokartrasterLayer(), []);
     const topoLayer = useMemo(() => TopoLayer(), []);
     const topograatoneLayer = useMemo(() => TopograatoneLayer(), []);
+    const osmLayer = useMemo(() => OSMLayer(), []);
 
     const sourceCRS = "EPSG:25832";
     const targetCRS = "EPSG:3857";
@@ -148,46 +133,38 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
 
     const {
       landLayers,
+      status,
       // error,
       // isError,
     } = useAppSelector((state: RootState) => state.unitLandLayer);
 
     let selectedLand: any = null;
-    let lastFeature: Feature | undefined = undefined;
+    const lastFeature: Record<string, Feature> = {};
     if (land) {
       selectedLand = land;
     }
 
     let unitLands: any = null;
+    let firstFeature: Feature | undefined = undefined;
     if (landLayers) {
       unitLands = landLayers;
     }
-    // else {
-    //   const storedData = localStorage.getItem("selected_land");
-    //   const parsedData = storedData ? JSON.parse(storedData) : null;
-    //   selectedLand = parsedData;
-    // }
 
-    // const mapVectorLayer = new VectorLayer({
-    //   style: new Style({
-    //     stroke: new Stroke({
-    //       color: "#00c3ff",
-    //       width: 1,
-    //     }),
-    //   }),
-    // });
-
-    const markerStyle = new Style({
-      image: new Icon({
-        src: "/assets/images/flag.png",
-        scale: 1, // Adjust scale as needed
-      }),
-    });
+    const markerStyle = useMemo(
+      () =>
+        new Style({
+          image: new Icon({
+            src: "/assets/images/flag.png",
+            scale: 1,
+          }),
+        }),
+      []
+    );
 
     const markerHideStyle = new Style({
       image: new Icon({
         src: "/assets/images/flag.png",
-        scale: 0.1, // Adjust scale as needed
+        scale: 0.1,
       }),
     });
 
@@ -201,13 +178,13 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
         width: 2,
       }),
       fill: new Fill({
-        color: "rgba(248, 12, 83, 0.2)", // Fill color (red with 20% opacity)
+        color: "rgba(248, 12, 83, 0.2)",
       }),
     });
 
     const fillStyle = new Style({
       fill: new Fill({
-        color: "rgba(248, 12, 83, 0.2)", // Fill color (red with 20% opacity)
+        color: "rgba(248, 12, 83, 0.2)",
       }),
       stroke: new Stroke({
         color: "rgba(248, 12, 83, 0.4)",
@@ -239,13 +216,30 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       style: selectStyle,
     });
 
-    const view = new View({
-      center: transform(mapCenter, "EPSG:4326", "EPSG:3857"), //y [10, 60], // Default center, previous working one ([(12.75, 65.3)] "EPSG:4326", "EPSG:3857")
-      zoom: store.getState().mapFeature.mapZoom, // Default zoom
-      projection: "EPSG:3857",
-      maxZoom: 19,
-      // resolutions: resolutions,
+    const userPositionSource = new VectorSource();
+    const userPositionLayer = new VectorLayer({
+      source: userPositionSource,
+      // style: userLocateStyle,
     });
+    console.log(
+      store.getState().mapFeature.mapZoom,
+      "store.getState().mapFeature.mapZoom"
+    );
+    const view = useMemo(
+      () =>
+        new View({
+          center: transform(
+            store.getState().mapFeature.mapCenter,
+            "EPSG:4326",
+            "EPSG:3857"
+          ), //y [10, 60], // Default center, previous working one ([(12.75, 65.3)] "EPSG:4326", "EPSG:3857")
+          zoom: store.getState().mapFeature.mapZoom, // Default zoom
+          projection: "EPSG:3857",
+          maxZoom: 19,
+          // resolutions: resolutions,
+        }),
+      []
+    );
 
     const map = new Map({
       // target: mapRef.current,
@@ -254,7 +248,9 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
         sjokartrasterLayer,
         topoLayer,
         topograatoneLayer,
+        osmLayer,
         drawnVectorLayer,
+        userPositionLayer,
       ],
       view: view,
       controls: [
@@ -277,7 +273,6 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
     const continuePolygonMsg: string = "Click to continue drawing the polygon";
     const continueLineMsg: string = "Click to continue drawing the line";
     const continuePointMsg: string = "Click to continue drawing the points";
-    //const select = new Select();
     let mouseOut: boolean = false;
     // #endregion
 
@@ -295,15 +290,6 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       ) {
         return;
       }
-      console.log(selectedLand, "land1");
-
-      const {
-        selectedColor,
-        selectedFontSize,
-        selectedLineSize,
-        selectedDrawOption,
-        selectedImageOption,
-      } = store.getState().draw;
 
       /// *** start - loading vector layer///
       // const transformCoordinates = (
@@ -353,7 +339,6 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
           },
         },
       });
-
       map.setTarget(mapRef.current);
       map.addOverlay(overlay);
 
@@ -361,10 +346,16 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       sjokartrasterLayer.setVisible(false);
       topoLayer.setVisible(true);
       topograatoneLayer.setVisible(false);
+      osmLayer.setVisible(false);
 
       // #region   for  land loaded
       const overlays: Overlay[] = [];
-      if (selectedLand && selectedLand.length > 0 && !noContent) {
+      if (
+        selectedTab === "selectedLand" &&
+        selectedLand &&
+        selectedLand.length > 0 &&
+        !noContent
+      ) {
         selectedLand.forEach((landFeature: any, index: number) => {
           const transformedFeatures: Feature<Geometry>[] = [];
           const vectorLandSource = new VectorSource();
@@ -379,7 +370,15 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
                 });
 
                 if (selectedLand.length === index + 1) {
-                  lastFeature = transformedFeature;
+                  const key =
+                    landFeature.features[0]?.properties?.Matrikkelnummertekst;
+                  if (key) {
+                    lastFeature[key] = transformedFeature;
+                  } else {
+                    console.error(
+                      "Matrikkelnummertekst is missing in properties."
+                    );
+                  }
                 }
                 if (!transformedFeature) {
                   console.error("Failed to transform feature:", feature);
@@ -468,9 +467,9 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       }
 
       ////////////////////
-      if (unitLands && unitLands.length > 0) {
+      if (selectedTab === "land" && unitLands && unitLands.length > 0) {
         // && !noContent ***
-        unitLands.forEach((layer: any) => {
+        unitLands.forEach((layer: any, index: number) => {
           layer.forEach((landFeature: any) => {
             const transformedFeatures: Feature<Geometry>[] = [];
             const vectorLandSource = new VectorSource();
@@ -487,9 +486,9 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
                     }
                   );
 
-                  //  if (selectedLand.length === index + 1) {
-                  //    lastFeature = transformedFeature;
-                  //  }
+                  if (index === 1) {
+                    firstFeature = transformedFeature;
+                  }
                   if (!transformedFeature) {
                     console.error("Failed to transform feature:", feature);
                     return;
@@ -637,7 +636,6 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       // #endregion
 
       // #region   for drawn features
-
       const addPoint = (coordinates: number[]) => {
         const iconType = store.getState().draw.selectedImageOption!;
         const iconColor = store.getState().draw.selectedColor!;
@@ -649,9 +647,11 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
           iconColor: iconColor,
           iconSize: iconSize,
         });
-
-        pointFeature.setStyle(getFeatureStyle(iconType, iconColor, iconSize));
-        drawnVectorSource.addFeature(pointFeature);
+        const featureStyle = getFeatureStyle(iconType, iconColor, iconSize);
+        if (featureStyle != null) {
+          pointFeature.setStyle(featureStyle);
+          drawnVectorSource.addFeature(pointFeature);
+        }
       };
 
       map.on("click", function (event) {
@@ -691,8 +691,6 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
           store.getState().draw.selectedDrawOption === "Edit" ||
           store.getState().draw.selectedDrawOption === "Delete"
         ) {
-          //   console.log("delete or edit");
-
           selectDrawnFeatures.on("select", (event) => {
             const selectedFeatures = event.selected;
             if (selectedFeatures.length > 0) {
@@ -710,59 +708,10 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
                 store.getState().draw.selectedDrawOption === "Delete"
               ) {
                 drawnVectorSource.removeFeature(selectedFeatures[0]);
-                // drawnVectorLayer
-                //   .getSource()
-                //   ?.removeFeature(selectedFeatures[0]);
-                //console.log("click delete");
               }
             }
-            //  if (selectedFeatures.length > 0) {
-            //    const properties = selectedFeatures[0].getProperties();
-            //    const { geometry, ...otherProperties } = properties;
-            //    alert(JSON.stringify(otherProperties, null, 2));
-            //  }
           });
         }
-        // else if (store.getState().draw.selectedDrawOption === null) {
-        //   const currentZoom = view.getZoom()!;
-        //   view.animate({
-        //     zoom: currentZoom + 1,
-        //     duration: 1000,
-        //     easing: easeIn, // Easing function (optional)
-        //   });
-        // }
-
-        // if (store.getState().draw.selectedDrawOption === null) {
-        //   map!.forEachFeatureAtPixel(evt.pixel, (feature) => {
-        //     // Step 3: Retrieve and display feature information
-        //     const properties = feature.getProperties();
-        //     alert(JSON.stringify(properties, null, 2));
-        //     return true;
-        //   });
-        ////////////////////////////////////////////
-        // setIsPopUpShow(true); //
-        //   map.forEachFeatureAtPixel(event.pixel, (feature) => {
-        //     // const geometry = feature.getGeometry() as Point;
-        //     //  const coordinates = geometry.getCoordinates();
-        //     const coordinate = event.coordinate;
-        //     const properties = feature.getProperties(); // Get all properties of the feature
-        //     // You can access specific attributes from the Hoydekurve data
-        //     const Folgerterrengdetalj = properties["Folgerterrengdetalj"];
-        //     const Noyaktighetsklasse = properties["Noyaktighetsklasse"];
-        //     const Administrativgrense = properties["Administrativgrense"];
-
-        //     // Set the popup content
-        //     const popupContent = `<p>Folgerterrengdetalj: ${Folgerterrengdetalj}</p>
-        // <p>Noyaktighetsklasse: ${Noyaktighetsklasse}</p>
-        // <p>Administrativgrense: ${Administrativgrense}</p>`; // Add more properties as needed
-
-        //     if (content) {
-        //       content.innerHTML = `<p>You clicked here:</p><code>${popupContent}</code>`;
-        //       overlay.setPosition(coordinate);
-        //     }
-        //   });
-        /////////////////////////////////////
-        //   }
       });
 
       map.getViewport().addEventListener("mouseleave", function () {
@@ -773,13 +722,12 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       });
 
       map.on("pointermove", function (event) {
+        // #region pointer cordinate to show
+        const coords: [number, number] = map.getEventCoordinate(
+          event.originalEvent
+        ) as [number, number];
+        dispatch(setCoordinates(coords));
         if (isValidDrawFeature(store.getState().draw.selectedDrawOption)) {
-          // #region pointer cordinate to show
-          const coords: [number, number] = map.getEventCoordinate(
-            event.originalEvent
-          ) as [number, number];
-          dispatch(setCoordinates(coords));
-
           // #endregion
           if (mouseOut) {
             mouseOut = false;
@@ -991,42 +939,6 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
         });
       };
 
-      const getFeatureStyle = (
-        iconType: string,
-        color: string,
-        size: string
-      ) => {
-        // icons for point  features
-        let svgString: string = "";
-
-        const iconMapping: any = {
-          position_marker: <HiLocationMarker style={{ color }} size={size} />,
-          point: <TbPoint style={{ color }} size={size} />,
-          circle: <FaRegCircle style={{ color }} size={size} />,
-          fence: <MdFence style={{ color }} size={size} />,
-          cross: <RxCross1 style={{ color }} size={size} />,
-          home: <RxHome style={{ color }} size={size} />,
-          hut: <GiHut style={{ color }} size={size} />,
-          tree: <LiaTreeSolid style={{ color }} size={size} />,
-          solid_tree: <FaTree style={{ color }} size={size} />,
-          tree_deciduous: <LuTreeDeciduous style={{ color }} size={size} />,
-          cow: <GiCow style={{ color }} size={size} />,
-          grass: <MdOutlineGrass style={{ color }} size={size} />,
-          // Add other mappings here...
-        };
-        if (iconMapping[iconType]) {
-          svgString = ReactDOMServer.renderToString(iconMapping[iconType]);
-        }
-
-        return new Style({
-          image: new Icon({
-            anchor: [0.3, 0.3],
-            src: "data:image/svg+xml;utf8," + svgString,
-            scale: 1,
-          }),
-        });
-      };
-
       const serializeFeatures = (
         features: Feature<Geometry>[]
       ): drawnFeature[] => {
@@ -1048,14 +960,12 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
         const features = drawnVectorSource.getFeatures();
         const serializedFeatures = serializeFeatures(features);
         dispatch(updateDrawnFeatures(serializedFeatures));
-        // console.log(features, "disapcth add");
       });
 
       drawnVectorSource.on("removefeature", () => {
         const features = drawnVectorSource.getFeatures();
         const serializedFeatures = serializeFeatures(features);
         dispatch(updateDrawnFeatures(serializedFeatures));
-        // console.log(features, "disapcth remove");
       });
 
       // #endregion
@@ -1065,18 +975,8 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
         return false;
       };
 
-      console.log(
-        selectedColor,
-        selectedFontSize,
-        selectedLineSize,
-        selectedDrawOption,
-        selectedImageOption
-      );
-
       // #region load saved map data
       if (!isSavedFeaturesLoading && savedFeatures.length > 0) {
-        //    const geojsonFormat = new GeoJSON();
-
         const geojsonObject = {
           type: "FeatureCollection",
           features: savedFeatures.map((feature) => {
@@ -1099,13 +999,12 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
           if (geometry instanceof Point) {
             const properties = olFeature.getProperties();
             if (properties.iconType) {
-              olFeature.setStyle(
-                getFeatureStyle(
-                  properties.iconType,
-                  properties.iconColor,
-                  properties.iconSize
-                )
+              const featureStyle = getFeatureStyle(
+                properties.iconType,
+                properties.iconColor,
+                properties.iconSize
               );
+              if (featureStyle) olFeature.setStyle(featureStyle);
             } else {
               olFeature.setStyle(
                 textStyle(properties.style.textColor, properties.style.text)
@@ -1163,38 +1062,24 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       savedFeatures,
     ]);
 
-    // useEffect(() => {
-    //   if (map && lastFeature) {
-    //     map.once("rendercomplete", () => {
-    //       // set extent to current land and add marker in center of extent
-    //       if (selectedLand) {
-    //         const extent = lastFeature?.getGeometry()?.getExtent();
-    //         if (extent) {
-    //           const centerLon = (extent[0] + extent[2]) / 2;
-    //           const centerLat = (extent[1] + extent[3]) / 2;
-    //           const centerCoordinates = transform(
-    //             [centerLon, centerLat],
-    //             targetCRS,
-    //             targetCRS
-    //           );
-    //           const markerFeature = new Feature(new Point(centerCoordinates));
-
-    //           markers?.getSource()?.addFeature(markerFeature);
-    //           map
-    //             .getView()
-    //             .fit(extent, { padding: [50, 50, 50, 50], duration: 2000 });
-    //           map.addLayer(markers);
-    //         }
-    //       }
-    //     });
-    //   }
-    // }, [map, lastFeature, targetCRS]);
-
     useEffect(() => {
       const onRenderComplete = () => {
         // set extent to current land and add marker in center of extent
-        if (selectedLand && selectedLand.length > 0) {
-          const extent = lastFeature?.getGeometry()?.getExtent();
+        if (
+          (view &&
+            selectedTab === "selectedLand" &&
+            !mapLoading &&
+            selectedLand &&
+            selectedLand.length > 0) ||
+          (selectedTab === "land" &&
+            status === "succeeded" &&
+            landLayers &&
+            landLayers.length > 0)
+        ) {
+          const extent =
+            selectedTab === "land"
+              ? firstFeature?.getGeometry()?.getExtent()
+              : Object.values(lastFeature)?.[0]?.getGeometry()?.getExtent();
           if (extent) {
             const centerLon = (extent[0] + extent[2]) / 2;
             const centerLat = (extent[1] + extent[3]) / 2;
@@ -1202,24 +1087,33 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
               [centerLon, centerLat],
               targetCRS,
               targetCRS
-            ); // Check if this transformation is necessary
-
-            const markerFeature = new Feature({
-              geometry: new Point(centerCoordinates),
-              name: "Marker",
-            });
-            markerFeature.setStyle(markerStyle);
-            if (markerRef.current) markerRef.current = markerFeature;
-            markers?.getSource()?.addFeature(markerFeature);
+            );
+            if (selectedTab === "selectedLand" && markerRef.current) {
+              const markerFeature = new Feature({
+                geometry: new Point(centerCoordinates),
+                name: "Marker",
+              });
+              markerFeature.setStyle(markerStyle);
+              markerRef.current = markerFeature;
+              markers?.getSource()?.addFeature(markerFeature);
+              map.addLayer(markers);
+            }
             map
               .getView()
               .fit(extent, { padding: [50, 50, 50, 50], duration: 2000 });
-            map.addLayer(markers);
+            if (selectedTab === "land") {
+              const targetZoom = 12;
+              setTimeout(() => {
+                if (map.getView().getZoom()) {
+                  view.setZoom(targetZoom);
+                }
+              }, 2000); // Wait for the `fit` animation to complete
+            }
           }
         }
         setTimeout(() => {
           dispatch(setLoadingState(false));
-        }, 1000);
+        }, 3000);
       };
 
       map.once("rendercomplete", onRenderComplete);
@@ -1230,13 +1124,18 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       };
     }, [
       map,
+      view,
       selectedLand,
+      landLayers,
+      firstFeature,
       lastFeature,
-      targetCRS,
       markerStyle,
       markerRef,
       markers,
       dispatch,
+      mapLoading,
+      status,
+      selectedTab,
     ]);
 
     // Step 2: Add a click event listener
@@ -1267,12 +1166,53 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       });
     };
 
-    const handleUserLocation = () => {
-      map.getView().animate({
-        center: store.getState().mapFeature.mapCenter, //map.getView().getZoom()! + 1,
-        duration: 250, // Animation duration in milliseconds
+    const handleUserLocation = (tracking: boolean) => {
+      const state = store.getState();
+      const userCoordinates = state.mapFeature.userCoordinate;
+      const mapZoom = state.mapFeature.mapZoom;
+      const accuracy = state.mapFeature.accuracy;
+
+      if (!userCoordinates || userCoordinates.length !== 2) {
+        console.error("Invalid user coordinates:", userCoordinates);
+        return;
+      }
+
+      const transformedCoords = transform(
+        userCoordinates,
+        "EPSG:4326",
+        "EPSG:3857"
+      );
+
+      userPositionSource.clear();
+
+      const accuracyCircle = new Circle(transformedCoords, accuracy);
+      const accuracyFeature = new Feature({
+        geometry: accuracyCircle,
       });
-      //  map.getView().setCenter(newCenter);
+
+      const accuracyStyle = getAccuracyStyle(accuracy);
+      if (accuracyStyle) {
+        accuracyFeature.setStyle(accuracyStyle);
+      }
+      userPositionSource.addFeature(accuracyFeature);
+
+      const userPointFeature = new Feature({
+        geometry: new Point(transformedCoords),
+        iconType: "position_marker_gi",
+        id: uuidv4(),
+      });
+      const iconColor = tracking ? "green" : "red";
+      const style = getFeatureStyle("position_marker_gi", iconColor, "32px");
+      if (style) {
+        userPointFeature.setStyle(style);
+      }
+      userPositionSource.addFeature(userPointFeature);
+
+      map.getView().setCenter(transformedCoords);
+      map.getView().animate({
+        zoom: mapZoom || 18,
+        duration: 3000,
+      });
     };
 
     const toggleBaseLayer = (layerName: string) => {
@@ -1280,6 +1220,7 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       sjokartrasterLayer.setVisible(layerName === "sjokartraster");
       topoLayer.setVisible(layerName === "topo");
       topograatoneLayer.setVisible(layerName === "topograatone");
+      osmLayer.setVisible(layerName === "osm");
     };
 
     /////////////////////////////////
@@ -1316,6 +1257,40 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       }
     };
     // }, [layerInfo]);
+
+    const markerRemove = () => {
+      const layerInfo = store.getState().selectedLayer.layerInfo;
+      if (layerInfo.layerName) {
+        const markerToRemove = lastFeature[layerInfo.layerName];
+        if (markerToRemove) {
+          const markerSource = markers.getSource();
+          markerSource?.removeFeature(markerToRemove); // Remove the specific marker
+          delete lastFeature[layerInfo.layerName];
+          markerSource?.changed(); // Force a refresh of the source
+        }
+      }
+    };
+    // const removeLayer = () => {
+    //   const layerInfo = store.getState().selectedLayer.layerInfo;
+
+    //   if (layerInfo?.layerName) {
+    //     const layers = map.getLayers().getArray();
+    //     const targetLayers = layers.filter(
+    //       (layer) => layer.get("Matrikkelnummertekst") === layerInfo.layerName
+    //     ) as [VectorLayer<VectorSource>];
+
+    //     if (targetLayers && targetLayers.length > 0) {
+    //       targetLayers.forEach((targetLayer) => {
+    //         map.removeLayer(targetLayer); // Remove the layer from the map
+    //       });
+    //       console.log(`Layer ${layerInfo.layerName} removed successfully.`);
+    //     } else {
+    //       console.error("Layer not found for removal.");
+    //     }
+    //   } else {
+    //     console.error("Invalid layer information provided for removal.");
+    //   }
+    // };
 
     const unitLayerSelection = () => {
       const layerInfo = store.getState().selectedLayer.layerInfo;
@@ -1377,8 +1352,12 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
         const displayOption = height > 80 ? "none" : "";
         mapToolRef.current.style.display = displayOption;
         //   const isSidebarVisible = store.getState().sideBar.isSidebarVisible;
-        //    const isSidebarVisible = height > 80 ? false : true;
-        //  dispatch(setSideBarVisibility(isSidebarVisible));
+        if (window.innerWidth > 1280) {
+          const isSidebarVisible = height > 80 ? false : true;
+          dispatch(setSideBarVisibility(isSidebarVisible));
+        } else {
+          dispatch(setSideBarVisibility(false));
+        }
       }
     };
 
@@ -1410,6 +1389,9 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
       },
       mapLayerChange: () => {
         layerSelection();
+      },
+      mapMarkerRemove: () => {
+        markerRemove();
       },
       mapUnitLayerChange: () => {
         unitLayerSelection();
@@ -1467,13 +1449,6 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
 
     return (
       <>
-        <div className="items-center flex flex-row gap-1 absolute m-auto  justify-center  shadow-2xl z-10">
-          {mapLoading && (
-            <div className="flex items-center justify-center h-screen overflow-y-hidden">
-              <Spinner />
-            </div>
-          )}
-        </div>
         <div id="popup" ref={popupRef} className={`${styles.popup} hidden`}>
           <a href="#" ref={closerRef} className={styles.popupCloser}></a>
           <div id="popup-content"></div>
@@ -1483,19 +1458,23 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
           className="absolute cursor-grab bg-white shadow-lg px-4 pb-4 rounded-lg max-w-xs hidden  dark:bg-gray-700 z-[9]"
         ></div>
         <div id="map" ref={mapRef} className={`${styles.map} relative`}>
-          <div
-            ref={mapToolRef}
-            className={`button-container  items-center  flex flex-col gap-2 absolute top-16 left-1 shadow-lg p-1 border-red-800  z-10`}
-          >
-            <UserLocate setUserLocation={handleUserLocation} />
-            <ZoomIn setZoom={handleZoom} />
-            <ZoomOut setZoom={handleZoom} />
-          </div>
-          <div className="items-center flex flex-row gap-1 absolute bottom-24 right-1  justify-center bg-gray-100 bg-opacity-30 shadow-lg z-10">
-            <CoordinateDisplay />
-          </div>
-          <div className="items-center flex flex-row gap-1 absolute bottom-4 right-1  justify-center bg-gray-100 bg-opacity-20 p-0.5 shadow-2xl z-10">
-            <LayerSelection toggleBaseLayer={toggleBaseLayer} />
+          <div ref={mapToolRef}>
+            <div
+              className={`button-container  items-center  flex flex-col gap-2 absolute top-16 left-1 shadow-lg p-1 border-red-800  z-10`}
+            >
+              <UserLocate setUserLocation={handleUserLocation} />
+              <ZoomIn setZoom={handleZoom} />
+              <ZoomOut setZoom={handleZoom} />
+              {status === "loading" && (
+                <SpinnerMini width={"w-8"} height={"h-8"} padding={"p-[4px]"} />
+              )}
+            </div>
+            <div className="items-center flex flex-row gap-1 absolute bottom-24 right-1  justify-center bg-gray-100 bg-opacity-30 shadow-lg z-10">
+              <CoordinateDisplay />
+            </div>
+            <div className="items-center flex flex-row gap-1 absolute bottom-4 right-1  justify-center bg-gray-100 bg-opacity-20 p-0.5 shadow-2xl z-10">
+              <LayerSelection toggleBaseLayer={toggleBaseLayer} />
+            </div>
           </div>
           {/* <div className="absolute  left-2 bottom-10 z-10">
           <button onClick={focusLayer}>xxx</button>
@@ -1503,7 +1482,7 @@ const MapWrapper: React.FC = forwardRef<MapWrapperRef, MapWrapperProps>(
         </div>
       </>
     );
-  }
+  })
 );
 
 export default MapWrapper as React.FC<

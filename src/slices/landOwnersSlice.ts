@@ -8,14 +8,6 @@ export type SharedLand = {
   unitId: number;
 };
 
-export type OwnedLand = {
-  unitId: number;
-  userId: number;
-  isDnnId: boolean;
-  isLandTab: boolean;
-  locale: string;
-};
-
 interface OwnersState {
   ownerDetails: LandOwnersObj | null;
   status: "idle" | "loading" | "succeeded" | "failed";

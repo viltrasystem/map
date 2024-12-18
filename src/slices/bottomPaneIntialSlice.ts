@@ -5,7 +5,7 @@ export interface BottomPaneIntialState {
 }
 
 const initialState: BottomPaneIntialState = {
-  initialHeight: 0,
+  initialHeight: 10,
 };
 
 const bottomPaneIntialSlice = createSlice({

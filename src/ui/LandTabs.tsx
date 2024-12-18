@@ -3,10 +3,11 @@ import FilterInput from "./FilterInput";
 import SlideToggle from "./SlideToggle";
 import SpinnerMini from "./SpinnerMini";
 import { RootState } from "../app/store";
-import { useAppSelector } from "../app/hook";
+import { useAppDispatch, useAppSelector } from "../app/hook";
+import { setSelectedTab } from "../slices/tabSelectionSlice";
 
 type TabProps = {
-  type?: string;
+  type: string;
   label: string;
   children: React.ReactNode;
 };
@@ -16,10 +17,10 @@ const Tab: React.FC<TabProps> = ({ children }) => {
 };
 
 type LandTabsProps = {
-  summaryType?: string;
+  summaryType: string;
   isMapView: boolean;
   children: React.ReactNode;
-  onToggle?: (value: boolean) => void;
+  onToggle: (value: boolean) => void;
 };
 
 const LandTabs: React.FC<LandTabsProps> = ({
@@ -28,15 +29,27 @@ const LandTabs: React.FC<LandTabsProps> = ({
   children,
   onToggle,
 }) => {
-  const [activeTab, setActiveTab] = useState(summaryType);
+  const dispatch = useAppDispatch();
+  const [activeTab, setActiveTab] = useState<string>("");
   const { status } = useAppSelector((state: RootState) => state.unitLandLayer);
+  const { selectedTab } = useAppSelector(
+    (state: RootState) => state.tabSelection
+  );
 
   useEffect(() => {
     setActiveTab(summaryType);
   }, [summaryType]);
 
+  useEffect(() => {
+    setActiveTab(selectedTab);
+  }, [selectedTab]);
+
   const handleToggle = (value: boolean) => {
-    if (!isMapView && onToggle) onToggle(value);
+    if (onToggle) onToggle(value); //!isMapView &&
+  };
+
+  const handleActiveTab = (tabType: string) => {
+    dispatch(setSelectedTab(tabType));
   };
 
   const tabs = React.Children.toArray(
@@ -55,20 +68,21 @@ const LandTabs: React.FC<LandTabsProps> = ({
                   ? "border-b-2 border-cyan-400 dark:border-cyan-400   text-slate-50 bg-sky-600"
                   : "border-b-2 border-slate-800  dark:border-slate-800 text-slate-50 bg-sky-700"
               }`}
-              onClick={() => setActiveTab(tab.props.type)}
+              onClick={() => handleActiveTab(tab.props.type!)}
             >
-              <div className="grid grid-flow-col justify-items-end">
+              <div className="grid grid-flow-col justify-items-end gap-2 items-center">
                 <p>{tab.props.label}</p>
-                {status === "loading" && (
-                  <p>
-                    <SpinnerMini />
-                  </p>
-                )}
+                {status === "loading" &&
+                  tab.props.type === "land" &&
+                  isMapView && (
+                    <p>
+                      <SpinnerMini />
+                    </p>
+                  )}
               </div>
             </button>
           ))}
         </div>
-        {/* {!isMapView && ( */}
         <div className="mb-1 flex gap-2 items-center">
           {activeTab === "land" && (
             <div className="">
@@ -79,11 +93,12 @@ const LandTabs: React.FC<LandTabsProps> = ({
               />
             </div>
           )}
-          <div className="">
-            <FilterInput />
-          </div>
+          {(activeTab === "land" || activeTab === "selectedLand") && (
+            <div className="">
+              <FilterInput />
+            </div>
+          )}
         </div>
-        {/* )} */}
       </div>
       <div className="tab-content  min-w-full">
         {tabs.filter((tab) => {

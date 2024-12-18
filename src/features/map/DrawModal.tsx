@@ -47,7 +47,8 @@ enum DrawFeature {
 }
 
 enum ImageFeature {
-  PositionMarker = "position_marker",
+  PositionMarkerHi = "position_marker_hi",
+  PositionMarkerGi = "position_marker_gi",
   Point = "point",
   Circle = "circle",
   Fence = "fence",
@@ -235,7 +236,8 @@ const DrawModal: React.FC<ModalState> = ({
 
   const handleImageFeature = (imageFeature: ImageFeature) => {
     const allowedImage: ImageFeature[] = [
-      ImageFeature.PositionMarker,
+      ImageFeature.PositionMarkerHi,
+      ImageFeature.PositionMarkerGi,
       ImageFeature.Point,
       ImageFeature.Circle,
       ImageFeature.Fence,
@@ -446,10 +448,12 @@ const DrawModal: React.FC<ModalState> = ({
                       size="20"
                       className="w-7 h-7"
                       style={
-                        icon === "position_marker" ? { color: iconStyle } : {}
+                        icon === "position_marker_gi"
+                          ? { color: iconStyle }
+                          : {}
                       }
                       onClick={() =>
-                        handleImageFeature(ImageFeature.PositionMarker)
+                        handleImageFeature(ImageFeature.PositionMarkerGi)
                       }
                     />
                   </div>

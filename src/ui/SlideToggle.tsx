@@ -20,7 +20,7 @@ const SlideToggle: React.FC<SlideToggleProps> = ({
 
   return (
     <div
-      className={`flex items-center cursor-pointer w-[60px] p-0.5 rounded-full transition-all
+      className={`flex items-center cursor-pointer w-[60px] p-0.5 rounded-full transition-all border-1 border-slate-400 dark:border-slate-400
         ${
           isOn ? "bg-sky-600 dark:bg-sky-500" : "bg-slate-400 dark:bg-slate-500"
         }`}

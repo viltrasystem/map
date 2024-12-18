@@ -443,3 +443,11 @@ export interface GeometryData {
   type: string;
   coordinates: object;
 }
+
+export type OwnedLand = {
+  unitId: number;
+  userId: number;
+  isDnnId: boolean;
+  isLandTab: boolean;
+  locale: string;
+};

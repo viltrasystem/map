@@ -1,20 +1,17 @@
-import { setSelectedRootUnitId } from "../../slices/treeSlice";
-import useUserUnitSelect from "../../hooks/useUserUnitSelect";
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hook";
+import { RootState } from "../../app/store";
+import { selectRootNode } from "../../lib/selectRootNode";
 
 const UnitList: React.FC = () => {
+  const { user } = useAppSelector((state: RootState) => state.auth);
   const { selectedRootUnitId, error } = useAppSelector((state) => state.tree);
-
-  const userUnit = useAppSelector((state) => state.userUnit);
-  const { selectRootNode } = useUserUnitSelect();
+  const { userUnitList } = useAppSelector((state) => state.userUnit);
 
   const dispatch = useAppDispatch();
 
   const handleSelectUnit = (unitId: number) => {
-    dispatch(setSelectedRootUnitId(unitId));
-    selectRootNode(unitId);
-    console.log(selectedRootUnitId, "selected new unit");
+    selectRootNode(unitId, userUnitList, user, dispatch);
   };
 
   if (error) {
@@ -37,8 +34,8 @@ const UnitList: React.FC = () => {
         >
           User Registered units
         </option>
-        {userUnit &&
-          userUnit?.map((unit) => (
+        {userUnitList &&
+          userUnitList?.map((unit) => (
             <option
               key={unit.UnitID}
               value={unit.UnitID}

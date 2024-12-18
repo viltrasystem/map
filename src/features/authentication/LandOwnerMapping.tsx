@@ -9,7 +9,7 @@ import { setLoadingState } from "../../slices/loadingSlice";
 import { logout } from "../../thunk/authThunk";
 import { LogoutRequest } from "../../lib/types";
 import { MappingState, setLandMapping } from "../../slices/landMappingSlice";
-import { setSummaryUnit } from "../../slices/summarySlice";
+import { setSelectedTab } from "../../slices/tabSelectionSlice";
 
 type UrlParams = {
   unitId?: string;
@@ -60,12 +60,7 @@ const LandOwnerMapping: React.FC = () => {
       subNo: "",
     };
 
-    dispatch(
-      setSummaryUnit({
-        unitId: landMapping.rootId,
-        summaryType: "landowner",
-      })
-    );
+    dispatch(setSelectedTab("landowner"));
     dispatch(setLandMapping(landMapping));
     navigate("/landowner");
   };

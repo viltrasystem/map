@@ -21,11 +21,8 @@ import LoadingModal from "../../ui/LoadingModal";
 import { useTranslation } from "react-i18next";
 import { setLoadingState } from "../../slices/loadingSlice";
 import IconButton, { IconClasses } from "../../ui/IconButton";
-import {
-  OwnedLand,
-  OwnerDetailReq,
-  OwnerInfo,
-} from "../../slices/landOwnersSlice";
+import { OwnerDetailReq, OwnerInfo } from "../../slices/landOwnersSlice";
+import { OwnedLand } from "../../lib/types";
 import { landOwners } from "../../thunk/landOwnersThunk";
 import landApi from "../../services/landApi";
 import { LandInfo, LandObj } from "../../slices/landSummarySlice";
@@ -61,7 +58,6 @@ const LandOwners = () => {
   const [isOwnerWindowOpen, setIsOwnerWindowOpen] = useState<boolean>(false);
   const [ownerDetailReq, setOwnerDetailReq] = useState<OwnerDetailReq>();
 
-  const { summaryInfo } = useAppSelector((state: RootState) => state.summary);
   const { ownerDetails } = useAppSelector(
     (state: RootState) => state.landOwners
   );
@@ -69,7 +65,9 @@ const LandOwners = () => {
   const globalFilter = useAppSelector(
     (state: RootState) => state.filter.globalFilter
   );
-  const { rootNode } = useAppSelector((state: RootState) => state.tree);
+  const { rootNode, selectedNode } = useAppSelector(
+    (state: RootState) => state.tree
+  );
   const { user } = useAppSelector((state: RootState) => state.auth);
   const dispatch = useAppDispatch();
 
@@ -84,19 +82,21 @@ const LandOwners = () => {
   };
 
   useEffect(() => {
-    const landReq: OwnedLand = {
-      unitId: summaryInfo.unitId,
-      locale: localeFormats[language as LocaleKey].locale,
-      isDnnId: false,
-      isLandTab: false,
-      userId: 0,
-    };
+    if (selectedNode) {
+      const landReq: OwnedLand = {
+        unitId: selectedNode.UnitID,
+        locale: localeFormats[language as LocaleKey].locale,
+        isDnnId: false,
+        isLandTab: false,
+        userId: 0,
+      };
 
-    if (summaryInfo.unitId > 0) {
-      dispatch(setLoadingState(true));
-      dispatch(landOwners(landReq));
+      if (selectedNode.UnitID > 0) {
+        dispatch(setLoadingState(true));
+        dispatch(landOwners(landReq));
+      }
     }
-  }, [summaryInfo.unitId]);
+  }, [selectedNode, dispatch, language]);
 
   useEffect(() => {
     if (ownerDetails) {
@@ -297,7 +297,7 @@ const LandOwners = () => {
     // autoResetPageIndex: false, // turn off page index reset when sorting or filtering
   });
 
-  const handleRowExpand = async (rowId: any, rowData: OwnerInfo) => {
+  const handleRowExpand = async (rowId: string, rowData: OwnerInfo) => {
     pageIndexRef.current = table.getState().pagination.pageIndex;
     if (!rowData.HasSubRows) {
       try {
@@ -306,12 +306,12 @@ const LandOwners = () => {
 
         if (rowData.IsSharedLand) {
           response = await landApi.sharedOwnersLand({
-            unitId: summaryInfo.unitId,
+            unitId: Number(selectedNode?.UnitID),
             landIdListStr: rowData.LandIdListStr,
           });
         } else {
           const ownedLand: OwnedLand = {
-            unitId: summaryInfo.unitId,
+            unitId: Number(selectedNode?.UnitID),
             userId: rowData.SystemUserId,
             isDnnId: false,
             isLandTab: false,
@@ -408,7 +408,7 @@ const LandOwners = () => {
     };
   }, [expanded]);
 
-  const handleSubRowExpand = async (rowId: any, subRowData: LandInfo) => {
+  const handleSubRowExpand = async (rowId: string, subRowData: LandInfo) => {
     pageIndexRef.current = table.getState().pagination.pageIndex;
     setData((prevData) => {
       return prevData?.map((item) => {
@@ -452,14 +452,12 @@ const LandOwners = () => {
 
   const handleMapView = (original: LandInfo): void => {
     ///////////////// rootNode.UnitID check*
-    const mapUrl = `/land_mapping/${summaryInfo.unitId}/${rootNode.UnitID}/${user.UserId}/${original.LandId}/${original.Municipality}/${original.MainNo}/${original.SubNo}`;
+    const mapUrl = `/land_mapping/${rootNode.UnitID}/${selectedNode?.UnitID}/${user.UserId}/${original.LandId}/${original.Municipality}/${original.MainNo}/${original.SubNo}`;
     navigate(mapUrl);
   };
 
   const landOwnerModalClose = () => {
     setIsOwnerWindowOpen(false);
-    //dispatch(setLoadingState(true));
-    // dispatch(landOwners(summaryInfo.unitId));
   };
 
   useEffect(() => {
@@ -474,33 +472,64 @@ const LandOwners = () => {
   if (isLoading) return <LoadingModal />;
   return (
     <>
-      {summaryInfo.unitId > 0 && ownerDetails && (
-        <div className="overflow-x-auto w-full min-w-full">
-          <table className="border-collapse w-full ">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      onClick={header.column.getToggleSortingHandler()}
-                      className={`py-1 px-1 text-left text-gray-800 dark:text-gray-200 font-sans text-sm border-[0.5px] border-slate-300 dark:border-slate-500   ${
-                        headerColorMapping[header.column.id as headerType] ||
-                        "bg-slate-200 dark:bg-slate-600"
-                      }`}
-                    >
-                      {!header.isPlaceholder && (
-                        <div className="flex items-center justify-between">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                          {header.column.getCanSort() ? (
-                            header.column.getIsSorted() ? (
-                              <span className="ml-1">
-                                {header.column.getIsSorted() === "desc" ? (
+      {selectedNode !== undefined &&
+        selectedNode.UnitID > 0 &&
+        ownerDetails && (
+          <div className="overflow-x-auto w-full min-w-full">
+            <table className="border-collapse w-full ">
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        className={`py-1 px-1 text-left text-gray-800 dark:text-gray-200 font-sans text-sm border-[0.5px] border-slate-300 dark:border-slate-500   ${
+                          headerColorMapping[header.column.id as headerType] ||
+                          "bg-slate-200 dark:bg-slate-600"
+                        }`}
+                      >
+                        {!header.isPlaceholder && (
+                          <div className="flex items-center justify-between">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            {header.column.getCanSort() ? (
+                              header.column.getIsSorted() ? (
+                                <span className="ml-1">
+                                  {header.column.getIsSorted() === "desc" ? (
+                                    <IconButton classes={iconClasses}>
+                                      <LiaSortAmountDownSolid
+                                        size={20}
+                                        className={`${
+                                          headerColorMapping[
+                                            header.column.id as headerType
+                                          ]
+                                            ? "dark:text-gray-600"
+                                            : ""
+                                        }`}
+                                      />
+                                    </IconButton>
+                                  ) : (
+                                    <IconButton classes={iconClasses}>
+                                      <LiaSortAmountDownAltSolid
+                                        size={20}
+                                        className={`${
+                                          headerColorMapping[
+                                            header.column.id as headerType
+                                          ]
+                                            ? "dark:text-gray-600"
+                                            : ""
+                                        }`}
+                                      />
+                                    </IconButton>
+                                  )}
+                                </span>
+                              ) : (
+                                <span className="ml-1">
                                   <IconButton classes={iconClasses}>
-                                    <LiaSortAmountDownSolid
+                                    <LiaSortSolid
                                       size={20}
                                       className={`${
                                         headerColorMapping[
@@ -511,259 +540,232 @@ const LandOwners = () => {
                                       }`}
                                     />
                                   </IconButton>
+                                </span>
+                              )
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.length > 0 ? (
+                  table.getRowModel().rows.map((row) => (
+                    <React.Fragment key={row.id}>
+                      <tr className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-sky-100 dark:hover:bg-sky-800">
+                        {row.getVisibleCells().map((cell) => (
+                          <td
+                            key={cell.id}
+                            className={`py-1 ${
+                              cell.column.id === "LandId" ? "px-1" : "px-2"
+                            }  font-extralight text-sm text-gray-700 dark:text-gray-300`}
+                          >
+                            {cell.column.id === "LandId" ? (
+                              <span
+                                {...{
+                                  onClick: () =>
+                                    handleRowExpand(row.id, row.original),
+                                  style: { cursor: "pointer" },
+                                }}
+                              >
+                                {loading[row.id] ? (
+                                  <IconButton classes={iconClasses}>
+                                    <SpinnerMini />
+                                  </IconButton>
+                                ) : expanded[row.id] ? (
+                                  <IconButton classes={iconClasses}>
+                                    <IoIosArrowUp size={20} />
+                                  </IconButton>
                                 ) : (
                                   <IconButton classes={iconClasses}>
-                                    <LiaSortAmountDownAltSolid
-                                      size={20}
-                                      className={`${
-                                        headerColorMapping[
-                                          header.column.id as headerType
-                                        ]
-                                          ? "dark:text-gray-600"
-                                          : ""
-                                      }`}
-                                    />
+                                    <IoIosArrowDown size={20} />
                                   </IconButton>
                                 )}
                               </span>
                             ) : (
-                              <span className="ml-1">
-                                <IconButton classes={iconClasses}>
-                                  <LiaSortSolid
-                                    size={20}
-                                    className={`${
-                                      headerColorMapping[
-                                        header.column.id as headerType
-                                      ]
-                                        ? "dark:text-gray-600"
-                                        : ""
-                                    }`}
-                                  />
-                                </IconButton>
-                              </span>
-                            )
-                          ) : (
-                            ""
-                          )}
-                        </div>
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.length > 0 ? (
-                table.getRowModel().rows.map((row) => (
-                  <React.Fragment key={row.id}>
-                    <tr className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-sky-100 dark:hover:bg-sky-800">
-                      {row.getVisibleCells().map((cell) => (
-                        <td
-                          key={cell.id}
-                          className={`py-1 ${
-                            cell.column.id === "LandId" ? "px-1" : "px-2"
-                          }  font-extralight text-sm text-gray-700 dark:text-gray-300`}
-                        >
-                          {cell.column.id === "LandId" ? (
-                            <span
-                              {...{
-                                onClick: () =>
-                                  handleRowExpand(row.id, row.original),
-                                style: { cursor: "pointer" },
-                              }}
-                            >
-                              {loading[row.id] ? (
-                                <IconButton classes={iconClasses}>
-                                  <SpinnerMini />
-                                </IconButton>
-                              ) : expanded[row.id] ? (
-                                <IconButton classes={iconClasses}>
-                                  <IoIosArrowUp size={20} />
-                                </IconButton>
-                              ) : (
-                                <IconButton classes={iconClasses}>
-                                  <IoIosArrowDown size={20} />
-                                </IconButton>
-                              )}
-                            </span>
-                          ) : (
-                            flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                    {expanded[row.id] && row.original.SubRows && (
-                      <tr>
-                        <td
-                          className="overflow-x-hidden"
-                          colSpan={columns.length}
-                        >
-                          <table className="border-collapse  w-full">
-                            <thead
-                              className="text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm
+                              flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                      {expanded[row.id] && row.original.SubRows && (
+                        <tr>
+                          <td
+                            className="overflow-x-hidden"
+                            colSpan={columns.length}
+                          >
+                            <table className="border-collapse  w-full">
+                              <thead
+                                className="text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm
                                  bg-gray-400 dark:bg-gray-600"
-                            >
-                              <tr>
-                                <th className="py-1 px-1text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm"></th>
-                                <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
-                                  {t("landOwnersTable:municipality")}
-                                </th>
-                                <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
-                                  {t("landOwnersTable:main_no")}
-                                </th>
-                                <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
-                                  {" "}
-                                  {t("landOwnersTable:sub_no")}
-                                </th>
-                                <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
-                                  {t("landOwnersTable:unit")}
-                                </th>
-                                <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
-                                  {" "}
-                                  {t("landOwnersTable:area_in_forest")}
-                                </th>
-                                <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
-                                  {t("landOwnersTable:area_in_mountain")}
-                                </th>
-                                <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
-                                  {t("landOwnersTable:area_in_agriculture")}
-                                </th>
-                                <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
-                                  {t("landOwnersTable:total_area")}
-                                </th>
-                                <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
-                                  {t("landOwnersTable:map")}
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {row.original.SubRows?.map(
-                                (subRow, subRowIndex) => (
-                                  <React.Fragment key={subRow.LandId}>
-                                    <tr className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-sky-200 dark:hover:bg-sky-600">
-                                      <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300 max-w-min">
-                                        <span
-                                          onClick={() =>
-                                            handleSubRowExpand(
-                                              `${row.id}-${subRowIndex}`,
-                                              subRow
-                                            )
-                                          }
-                                          style={{ cursor: "pointer" }}
-                                        >
-                                          {expanded[
-                                            `${row.id}-${subRowIndex}`
-                                          ] ? (
-                                            <IconButton classes={iconClasses}>
-                                              <IoIosArrowUp size={15} />
-                                            </IconButton>
-                                          ) : (
-                                            <IconButton classes={iconClasses}>
-                                              <IoIosArrowDown size={15} />
-                                            </IconButton>
-                                          )}
-                                        </span>
-                                      </td>
-                                      <td className="py-1 1 font-extralight text-sm text-gray-700 dark:text-gray-300">
-                                        {subRow.Municipality}
-                                      </td>
-                                      <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
-                                        {subRow.MainNo}
-                                      </td>
-                                      <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
-                                        {subRow.SubNo}
-                                      </td>
-                                      <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
-                                        {subRow.LandUnit}
-                                      </td>
-                                      <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
-                                        {subRow.AreaInForest}
-                                      </td>
-                                      <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
-                                        {subRow.AreaInMountain}
-                                      </td>
-                                      <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
-                                        {subRow.AreaInAgriculture}
-                                      </td>
-                                      <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
-                                        {subRow.TotalArea}
-                                      </td>
-                                      <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
-                                        <button
-                                          onClick={() => handleMapView(subRow)}
-                                          className="flex items-center justify-center px-2 py-1 rounded-lg font-medium text-sm transition-all focus:outline-none focus:ring-sky-400 text-white bg-sky-500 hover:bg-sky-600 active:bg-sky-600
+                              >
+                                <tr>
+                                  <th className="py-1 px-1text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm"></th>
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                    {t("landOwnersTable:municipality")}
+                                  </th>
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                    {t("landOwnersTable:main_no")}
+                                  </th>
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                    {" "}
+                                    {t("landOwnersTable:sub_no")}
+                                  </th>
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                    {t("landOwnersTable:unit")}
+                                  </th>
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                    {" "}
+                                    {t("landOwnersTable:area_in_forest")}
+                                  </th>
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                    {t("landOwnersTable:area_in_mountain")}
+                                  </th>
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                    {t("landOwnersTable:area_in_agriculture")}
+                                  </th>
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                    {t("landOwnersTable:total_area")}
+                                  </th>
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                    {t("landOwnersTable:map")}
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {row.original.SubRows?.map(
+                                  (subRow, subRowIndex) => (
+                                    <React.Fragment key={subRow.LandId}>
+                                      <tr className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-sky-200 dark:hover:bg-sky-600">
+                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300 max-w-min">
+                                          <span
+                                            onClick={() =>
+                                              handleSubRowExpand(
+                                                `${row.id}-${subRowIndex}`,
+                                                subRow
+                                              )
+                                            }
+                                            style={{ cursor: "pointer" }}
+                                          >
+                                            {expanded[
+                                              `${row.id}-${subRowIndex}`
+                                            ] ? (
+                                              <IconButton classes={iconClasses}>
+                                                <IoIosArrowUp size={15} />
+                                              </IconButton>
+                                            ) : (
+                                              <IconButton classes={iconClasses}>
+                                                <IoIosArrowDown size={15} />
+                                              </IconButton>
+                                            )}
+                                          </span>
+                                        </td>
+                                        <td className="py-1 1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                          {subRow.Municipality}
+                                        </td>
+                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                          {subRow.MainNo}
+                                        </td>
+                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                          {subRow.SubNo}
+                                        </td>
+                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                          {subRow.LandUnit}
+                                        </td>
+                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                          {subRow.AreaInForest}
+                                        </td>
+                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                          {subRow.AreaInMountain}
+                                        </td>
+                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                          {subRow.AreaInAgriculture}
+                                        </td>
+                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                          {subRow.TotalArea}
+                                        </td>
+                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                          <button
+                                            onClick={() =>
+                                              handleMapView(subRow)
+                                            }
+                                            className="flex items-center justify-center px-2 py-1 rounded-lg font-medium text-sm transition-all focus:outline-none focus:ring-sky-400 text-white bg-sky-500 hover:bg-sky-600 active:bg-sky-600
                                                          dark:text-gray-200 dark:bg-sky-600 dark:hover:bg-sky-500 dark:active:bg-sky-600"
-                                        >
-                                          <FaRegMap />
-                                        </button>
-                                      </td>
-                                    </tr>
-                                    {subRow.HasSubSubRows && (
-                                      <tr>
-                                        <td colSpan={columns.length}>
-                                          <SubSubRow land={subRow} />
+                                          >
+                                            <FaRegMap />
+                                          </button>
                                         </td>
                                       </tr>
-                                    )}
-                                  </React.Fragment>
-                                )
-                              )}
-                            </tbody>
-                          </table>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))
-              ) : (
-                <tr className="bg-gray-50 dark:bg-gray-800">
-                  <td
-                    colSpan={columns.length}
-                    className="text-left text-sm py-3 px-6 text-gray-700 dark:text-gray-300"
-                  >
-                    {t("landOwnersTable:no_data")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-            <tfoot>
-              {table.getFooterGroups().map((footerGroup) => (
-                <tr key={footerGroup.id}>
-                  {footerGroup.headers.map((header) => (
+                                      {subRow.HasSubSubRows && (
+                                        <tr>
+                                          <td colSpan={columns.length}>
+                                            <SubSubRow land={subRow} />
+                                          </td>
+                                        </tr>
+                                      )}
+                                    </React.Fragment>
+                                  )
+                                )}
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))
+                ) : (
+                  <tr className="bg-gray-50 dark:bg-gray-800">
                     <td
-                      key={header.id}
-                      className="py-1 px-3 text-left text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm bg-gray-400 dark:bg-gray-600"
+                      colSpan={columns.length}
+                      className="text-left text-sm py-3 px-6 text-gray-700 dark:text-gray-300"
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.footer,
-                            header.getContext()
-                          )}
+                      {t("landOwnersTable:no_data")}
                     </td>
-                  ))}
-                </tr>
-              ))}
-            </tfoot>
-          </table>
-          <Pagination table={table} />
-          {isOwnerWindowOpen && ownerDetailReq && (
-            <Owner
-              ownerDetailReq={ownerDetailReq}
-              landOwnerModalClose={landOwnerModalClose}
-            />
-          )}
-          {isOwnerWindowOpen && (
-            <div
-              className="fixed inset-0 bg-black opacity-50 z-10"
-              // onClick={landOwnerModalClose}
-            ></div>
-          )}
-        </div>
-      )}
+                  </tr>
+                )}
+              </tbody>
+              <tfoot>
+                {table.getFooterGroups().map((footerGroup) => (
+                  <tr key={footerGroup.id}>
+                    {footerGroup.headers.map((header) => (
+                      <td
+                        key={header.id}
+                        className="py-1 px-3 text-left text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm bg-gray-400 dark:bg-gray-600"
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.footer,
+                              header.getContext()
+                            )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tfoot>
+            </table>
+            <Pagination table={table} />
+            {isOwnerWindowOpen && ownerDetailReq && (
+              <Owner
+                ownerDetailReq={ownerDetailReq}
+                landOwnerModalClose={landOwnerModalClose}
+              />
+            )}
+            {isOwnerWindowOpen && (
+              <div
+                className="fixed inset-0 bg-black opacity-50 z-10"
+                // onClick={landOwnerModalClose}
+              ></div>
+            )}
+          </div>
+        )}
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { MouseEventHandler, useEffect, useState } from "react";
+import { MouseEventHandler, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   HiBars3,
@@ -23,6 +23,8 @@ import LandSelector from "../features/land/LandSelector";
 import { setSelectedDrawOption } from "../slices/mapDrawFeatureSlice";
 import { toast } from "react-toastify";
 import { getToastOptions, wordExistsInUri } from "../lib/helpFunction";
+import { useAppContext } from "../context/AppContext";
+import { setSelectedTab } from "../slices/tabSelectionSlice";
 
 interface HeaderProps {
   isFetchedUserUnits: boolean;
@@ -30,9 +32,7 @@ interface HeaderProps {
 }
 const Header: React.FC<HeaderProps> = ({ isFetchedUserUnits }) => {
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state: RootState) => state.auth);
-  //const { summaryInfo } = useAppSelector((state: RootState) => state.summary);
-
+  const { mapWrapperRef } = useAppContext();
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLandSelectorModalOpen, setIsLandSelectorModalOpen] = useState(false);
@@ -40,12 +40,6 @@ const Header: React.FC<HeaderProps> = ({ isFetchedUserUnits }) => {
     (state: RootState) => state.mapDrawnFeature.isLoading
   );
 
-  const { status: landLoading } = useAppSelector(
-    (state: RootState) => state.landSummary
-  );
-  const { status: landOwnersLoading } = useAppSelector(
-    (state: RootState) => state.landOwners
-  );
   const { rootId, unitId, currentUserId, municipality, mainNo, subNo } =
     useAppSelector((state: RootState) => state.mapping);
   const { drawnFeatures } = useAppSelector(
@@ -79,6 +73,7 @@ const Header: React.FC<HeaderProps> = ({ isFetchedUserUnits }) => {
     HTMLButtonElement
   > = (): void => {
     const url = `/dashboard`;
+    dispatch(setSelectedTab("land"));
     navigate(url);
   };
   const linkBtnclickHandler: MouseEventHandler<
@@ -92,12 +87,7 @@ const Header: React.FC<HeaderProps> = ({ isFetchedUserUnits }) => {
   const mapLayerBtnclickHandler: MouseEventHandler<
     HTMLButtonElement
   > = (): void => {
-    const landUrl = `/land/${
-      store.getState().summary.summaryInfo.unitId > 0
-        ? store.getState().summary.summaryInfo.unitId
-        : store.getState().tree.selectedRootUnitId
-    }/${user.UserId}`;
-    navigate(landUrl);
+    navigate("/land");
   };
   const saveBtnclickHandler: MouseEventHandler<
     HTMLButtonElement
@@ -122,11 +112,11 @@ const Header: React.FC<HeaderProps> = ({ isFetchedUserUnits }) => {
     // closeToolTip();
   };
 
-  useEffect(() => {
-    if ((landLoading || landOwnersLoading) && isOpen) {
-      setIsOpen(false);
+  const handleSelectedLayerLoad = () => {
+    if (mapWrapperRef.current) {
+      mapWrapperRef.current.mapLayerChange();
     }
-  }, [landLoading, landOwnersLoading]);
+  };
 
   return (
     <nav className="bg-white dark:bg-gray-900 border-gray-200">
@@ -142,23 +132,24 @@ const Header: React.FC<HeaderProps> = ({ isFetchedUserUnits }) => {
         <div className="flex-1 flex items-center justify-between">
           {/* button area */}
           <div className="flex-shrink-0 flex md:w-auto  justify-between items-center  space-x-1 sm:space-x-4">
-            <IconButton onClick={searchBtnclickHandler}>
-              <HiOutlineSearch size={35} />
-            </IconButton>
             <IconButton onClick={homeBtnclickHandler}>
               <HiOutlineHome size={35} />
             </IconButton>
+            {!wordExistsInUri("land") &&
+              store.getState().tree.rootNode.UnitTypeID !== 6 && (
+                <IconButton onClick={mapLayerBtnclickHandler}>
+                  <TbMapPlus size={35} />
+                </IconButton>
+              )}
             <IconButton onClick={linkBtnclickHandler}>
               <HiOutlineLink size={35} />
+            </IconButton>
+            <IconButton onClick={searchBtnclickHandler}>
+              <HiOutlineSearch size={35} />
             </IconButton>
             {wordExistsInUri("dashboard") && (
               <IconButton onClick={drawBtnclickHandler}>
                 <LiaDrawPolygonSolid size={35} />
-              </IconButton>
-            )}
-            {!wordExistsInUri("land") && (
-              <IconButton onClick={mapLayerBtnclickHandler}>
-                <TbMapPlus size={35} />
               </IconButton>
             )}
             {wordExistsInUri("dashboard") &&
@@ -184,6 +175,7 @@ const Header: React.FC<HeaderProps> = ({ isFetchedUserUnits }) => {
               <LandSelector
                 isLandSelectorModalIsOpen={isLandSelectorModalOpen}
                 landSelectorModalClose={() => setIsLandSelectorModalOpen(false)}
+                onSelectedLayerLoad={() => handleSelectedLayerLoad()}
               />
             )}
           </div>

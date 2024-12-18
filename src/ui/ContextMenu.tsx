@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hook";
 import { GrMapLocation } from "react-icons/gr";
 import { MdOutlinePersonPinCircle } from "react-icons/md";
-import { setSummaryUnit } from "../slices/summarySlice";
-//import { BeakerIcon } from "@heroicons/react/24/solid";
+import { setSelectedTab } from "../slices/tabSelectionSlice";
+import { setSelectedNode } from "../slices/treeSlice";
 
 interface ContextMenuProp {
   // x: number;
@@ -51,22 +51,13 @@ const ContextMenu: React.FC<ContextMenuProp> = ({
     // Navigate to a different path based on the item
     switch (item) {
       case "land":
-        dispatch(
-          setSummaryUnit({
-            unitId: unitId,
-            summaryType: "land",
-          })
-        );
+        dispatch(setSelectedNode(unitId));
+        dispatch(setSelectedTab("land"));
         navigate(`/land`);
-        //navigate(`/land/${unitId}/${userId}`);
         break;
       case "landowner":
-        dispatch(
-          setSummaryUnit({
-            unitId: unitId,
-            summaryType: "landowner",
-          })
-        );
+        dispatch(setSelectedNode(unitId));
+        dispatch(setSelectedTab("landowner"));
         navigate(`/land`);
         break;
       default:
@@ -90,7 +81,7 @@ const ContextMenu: React.FC<ContextMenuProp> = ({
       //   top: `${y - (panelRectY ? panelRectY : 0)}px`,
       // }}
     >
-      <ul className="w-48 flex flex-col shadow-md rounded-sm overflow-hidden divide-y text-[13px] divide-gray-200 text-blue-500 bg-white dark:bg-gray-900 absolute z-50  border border-gray-200">
+      <ul className="w-48 flex flex-col shadow-md rounded-md overflow-hidden divide-y text-[13px] divide-gray-200 text-blue-500 bg-white dark:bg-gray-900 absolute z-50  border border-gray-200">
         {nodeData?.UnitTypeID != 6 && rootNode?.UnitTypeID != 0 && (
           <li
             onClick={() => handleMenuItemClick("land")}

@@ -103,6 +103,51 @@ const selectedlandSlice = createSlice({
       // };
       state.landList.push(action.payload);
     },
+    removeSelectedLandLayer: (state, action: PayloadAction<SelectedLand>) => {
+      const { municipality, mainNo, subNo, plotNo } = action.payload;
+
+      state.landInfo = state.landInfo.filter((land) => {
+        const isMatch =
+          land.Municipality === municipality &&
+          land.MainNo === mainNo.toString() &&
+          land.SubNo === subNo.toString();
+
+        // If plotNo is provided, include it in the matching criteria
+        if (plotNo !== undefined) {
+          return !(isMatch && land.PlotNo === plotNo);
+        }
+
+        return !isMatch;
+      });
+
+      state.landList = state.landList.filter((land) => {
+        const isMatch =
+          land.municipality === municipality &&
+          land.mainNo === mainNo &&
+          land.subNo === subNo;
+
+        if (plotNo !== undefined) {
+          return !(isMatch && land.plotNo === plotNo);
+        }
+
+        return !isMatch;
+      });
+
+      state.land = state.land.filter((featureCollection) => {
+        const feature = featureCollection.features[0];
+        const { Kommunenummer, Matrikkelnummertekst } = feature.properties;
+
+        return !(
+          Kommunenummer === municipality &&
+          Matrikkelnummertekst === `${mainNo}/${subNo}`
+        );
+      });
+
+      state.existingLandList = state.existingLandList.filter(
+        (existingFeature) =>
+          existingFeature.identificationStr !== `${mainNo}/${subNo}`
+      );
+    },
     // setSelectedLayerState: (state, action: PayloadAction<any>) => {
     //   state.layerInfo.layerName = action.payload.layerName;
     //   state.layerInfo.isClicked = action.payload.isClicked;
@@ -324,6 +369,7 @@ const selectedlandSlice = createSlice({
   },
 });
 
-export const { setselectedLandState } = selectedlandSlice.actions;
+export const { setselectedLandState, removeSelectedLandLayer } =
+  selectedlandSlice.actions;
 
 export default selectedlandSlice.reducer;

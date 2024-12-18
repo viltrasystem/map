@@ -15,7 +15,7 @@ const FilterInput: React.FC = () => {
   };
 
   const inputClasses: string =
-    "h-6 w-full rounded-md border  border-1  border-slate-400 dark:border-slate-200 bg-transparent px-2 py-1 font-sans text-sm font-normal text-slate-700 dark:text-slate-100 outline outline-0 transition-all focus:placeholder-opacity-0 focus:border-customBlue  focus:outline-0";
+    "h-6 w-full rounded-md border  border-1  border-slate-400 dark:border-slate-400 bg-transparent px-2 py-1 font-sans text-sm font-normal text-slate-700 dark:text-slate-700 outline outline-0 transition-all focus:placeholder-opacity-0 focus:border-customBlue  focus:outline-0";
   return (
     <input
       type="text"

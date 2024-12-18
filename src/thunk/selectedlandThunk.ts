@@ -8,6 +8,7 @@ import {
 import selectedLandApiService from "../services/selectedLandApi";
 import { setInitialHeightState } from "../slices/bottomPaneIntialSlice";
 import axios from "axios";
+import { setLoadingState } from "../slices/loadingSlice";
 // Action type constants
 const LOADLAND = "LOADLAND";
 
@@ -32,8 +33,10 @@ export const loadLand = createAsyncThunk<
           : 0;
       const initialHeight = currentRowsHeight > 20 ? 20 : currentRowsHeight;
       dispatch(setInitialHeightState(initialHeight));
+      dispatch(setLoadingState(false));
       return response.data;
     } catch (error) {
+      dispatch(setLoadingState(false));
       if (axios.isAxiosError(error)) {
         const apiError = error.response?.data as ApiResponse;
         return rejectWithValue({

@@ -6,6 +6,7 @@ import mapFeatureReducer from "../slices/mapFeatureSlice";
 import mapDrawnFeatureReducer from "../slices/mapDrawnFeatureSlice";
 import selectlandReducer from "../slices/selectedlandSlice";
 import selectedLayerReducer from "../slices/selectedLayerSlice";
+import tabSelectionReducer from "../slices/tabSelectionSlice";
 import unitLandLayerReducer from "../slices/unitLandLayerSlice";
 //import selectedlandInfoReducer from "../slices/selectedLandInfoSlice";
 import sosiReducer from "../slices/sosiSlice";
@@ -49,6 +50,7 @@ const appReducer = combineReducers({
   selectland: selectlandReducer,
   unitLandLayer: unitLandLayerReducer,
   selectedLayer: selectedLayerReducer,
+  tabSelection: tabSelectionReducer,
   landSummary: landSummaryReducer,
   summary: summaryReducer,
   landOwners: landOwnersReducer,

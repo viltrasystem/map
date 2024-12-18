@@ -14,7 +14,8 @@ export interface DrawState {
     | null;
 
   selectedImageOption:
-    | "position_marker"
+    | "position_marker_hi"
+    | "position_marker_gi"
     | "point"
     | "circle"
     | "fence"

@@ -54,11 +54,13 @@ const useValidateRequest = ({
 
     onValidationComplete(true, true); // Indicate validation success
   }, [
+    user,
     params,
     validationCallbacks,
     userId,
     routeIdentifier,
     onValidationComplete,
+    t,
   ]);
 };
 

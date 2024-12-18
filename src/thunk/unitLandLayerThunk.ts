@@ -1,24 +1,23 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { ApiResponse, ErrorState } from "../lib/types";
+import { ApiResponse, ErrorState, OwnedLand } from "../lib/types";
 import unitLandLayerApiService from "../services/unitLandLayerApi";
 import { setInitialHeightState } from "../slices/bottomPaneIntialSlice";
 import axios from "axios";
 import { setLoadingState } from "../slices/loadingSlice";
-import { UnitLand } from "../slices/unitLandLayerSlice";
 // Action type constants
 const LOADUNITLANDLAYER = "LOADUNITLANDLAYER";
 
 export const loadUnitLandLayer = createAsyncThunk<
   any | string, //***
-  UnitLand,
+  OwnedLand,
   { rejectValue: ErrorState }
 >(
   LOADUNITLANDLAYER,
-  async (landReq: UnitLand, { rejectWithValue, dispatch }) => {
+  async (landReq: OwnedLand, { rejectWithValue, dispatch }) => {
     try {
-      const response = await unitLandLayerApiService.loadUnitLandLayers(
-        landReq.unitId
-      );
+      const response = landReq.isLandTab
+        ? await unitLandLayerApiService.loadUnitOwnersLandLayers(landReq)
+        : await unitLandLayerApiService.loadUnitLandLayers(landReq.unitId);
       if (response.data.StatusCode === 204) {
         return { noContent: true };
       }
@@ -30,7 +29,6 @@ export const loadUnitLandLayer = createAsyncThunk<
         return { noContent: true };
       }
       dispatch(setLoadingState(false));
-      console.log(landReq.locale);
       return { data: response.data, locale: landReq.locale };
     } catch (error) {
       dispatch(setLoadingState(false));

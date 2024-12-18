@@ -25,15 +25,44 @@ export type UserUnit = {
   IsHuntingPolice: boolean;
 };
 
-const initialState: UserUnit[] = [];
+interface UserUnitState {
+  userUnitList: UserUnit[];
+}
+const initialState: UserUnitState = {
+  userUnitList: [],
+};
 
 const userUnitSlice = createSlice({
   name: "userUnit",
   initialState: initialState,
   reducers: {
     setUserUnitList: (state, action: PayloadAction<UserUnit[]>) => {
-      console.log(state.values, action.payload, "userlist set");
-      return action.payload;
+      // Replace the entire array immutably
+
+      state.userUnitList = action.payload.map((userUnit) => ({
+        ChildCount: userUnit.ChildCount,
+        ChildTeamsCount: userUnit.ChildTeamsCount,
+        ImgUrl: userUnit.ImgUrl,
+        IsActiveForHunting: userUnit.IsActiveForHunting,
+        IsAllowedToRegisterLands: userUnit.IsAllowedToRegisterLands,
+        IsArchived: userUnit.IsArchived,
+        IsExporter: userUnit.IsExporter,
+        IsGuest: userUnit.IsGuest,
+        IsHead: userUnit.IsHead,
+        IsHuntingComplete: userUnit.IsHuntingComplete,
+        IsHuntingPolice: userUnit.IsHuntingPolice,
+        IsLandAssignableUser: userUnit.IsLandAssignableUser,
+        IsLandOwner: userUnit.IsLandOwner,
+        IsMainUnit: userUnit.IsMainUnit,
+        IsMunicipalityUser: userUnit.IsMunicipalityUser,
+        IsPriceUser: userUnit.IsPriceUser,
+        IsReporter: userUnit.IsReporter,
+        ParentUnit: userUnit.ParentUnit,
+        ReferenceID: userUnit.ReferenceID,
+        Unit: userUnit.Unit,
+        UnitID: userUnit.UnitID,
+        UnitTypeID: userUnit.UnitTypeID,
+      }));
     },
   },
 });

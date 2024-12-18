@@ -15,6 +15,7 @@ import {
   OnChangeFn,
   ExpandedState,
   FilterFn,
+  Row,
 } from "@tanstack/react-table";
 
 import { LandInfo } from "../../slices/landSummarySlice";
@@ -32,9 +33,9 @@ import { useTranslation } from "react-i18next";
 import Pagination from "../../ui/Pagination";
 import SubSubRow from "../land/SubSubRow";
 import { setSelectedLayerState } from "../../slices/selectedLayerSlice";
-
 type UnitLandTableProps = {
   onUnitLayerChanged: () => void;
+  toggleState: boolean;
 };
 
 const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
@@ -51,15 +52,22 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
   const globalFilter = useAppSelector(
     (state: RootState) => state.filter.globalFilter
   );
-  const { landDetails } = useAppSelector(
+  const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+
+  const { selectedNode } = useAppSelector(
+    (state: RootState) => ({
+      selectedNode: state.tree.selectedNode,
+    }),
+    (prev, next) => prev.selectedNode === next.selectedNode
+  );
+
+  const { landDetails, status } = useAppSelector(
     (state: RootState) => state.unitLandLayer
   );
 
   const pageIndexRef = useRef(pagination.pageIndex);
   const { isLoading } = useAppSelector((state: RootState) => state.loading);
-
-  const dispatch = useAppDispatch();
-  const { t } = useTranslation();
 
   const iconClasses: IconClasses = {
     padding_x: "px-[2px]",
@@ -68,7 +76,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
   };
 
   useEffect(() => {
-    if (landDetails) {
+    if (landDetails !== undefined) {
       setData(landDetails.Lands);
     }
   }, [landDetails]);
@@ -150,9 +158,9 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
         enableSorting: true,
       }),
     ],
-    [columnHelper, t, landDetails]
+    []
   );
-  console.log("land summery table land re render");
+  console.log("unit land table land re render................");
   type headerColorMappingType =
     | "AreaInForest"
     | "AreaInAgriculture"
@@ -197,19 +205,15 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
     onExpandedChange: setExpanded as OnChangeFn<ExpandedState>,
     onSortingChange: setSorting, // Handle sorting state
     getSortedRowModel: getSortedRowModel(),
-    // onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
     globalFilterFn: customGlobalFilter,
-    // getSubRows: (row) => row.SubTableContant ?? [],
-    //paginateExpandedRows: false,
-    // autoResetPageIndex: false, // turn off page index reset when sorting or filtering
   });
 
-  const handleRowExpand = (rowId: any) => {
+  const handleRowExpand = (rowId: string) => {
     pageIndexRef.current = table.getState().pagination.pageIndex;
     setData((prevData) => {
       const updatedData = prevData?.map((item, index) => {
-        if (index == rowId) {
+        if (index == Number(rowId)) {
           return {
             ...item,
             HasSubRows: item.HasSubRows ? true : false,
@@ -225,6 +229,11 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
       ...prevExpanded,
       [rowId]: !prevExpanded[rowId],
     }));
+    // setExpanded((prevExpanded) =>
+    //   prevExpanded[rowId] !== !prevExpanded[rowId]
+    //     ? { ...prevExpanded, [rowId]: !prevExpanded[rowId] }
+    //     : prevExpanded
+    // );
   };
 
   useEffect(() => {
@@ -251,9 +260,12 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
     return () => {
       dispatch(setGlobalFilter(""));
     };
-  }, []);
+  }, [dispatch]);
 
-  const handleRowClick = (row: any, rowElement: HTMLTableRowElement) => {
+  const handleRowClick = (
+    row: Row<LandInfo>,
+    rowElement: HTMLTableRowElement
+  ) => {
     const rowData = row.original as LandInfo;
     const layerString = `${rowData.LandId}`;
     // console.log(layerString);
@@ -273,7 +285,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
     //  currentSelectedRowId.current = rowData.LandId;
   };
 
-  const handleMouseEnter = (row: any) => {
+  const handleMouseEnter = (row: Row<LandInfo>) => {
     const rowData = row.original as LandInfo;
     const layerString = `${rowData.LandId}`;
     dispatch(
@@ -292,7 +304,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
     // currentSelectedRowId.current = rowData.LandId;
   };
 
-  const handleMouseLeave = (row: any) => {
+  const handleMouseLeave = (row: Row<LandInfo>) => {
     const rowData = row.original as LandInfo;
     const layerString = `${rowData.LandId}`;
     dispatch(
@@ -303,77 +315,39 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
       })
     );
     onUnitLayerChanged();
-    // if (selectedRowRef.current) {
-    //   selectedRowRef.current.classList.remove("bg-red-400");
-    // }
-    // rowElement.classList.add("bg-red-400");
-    // selectedRowRef.current = rowElement;
-    // currentSelectedRowId.current = rowData.LandId;
   };
 
   if (isLoading) return <LoadingModal />;
   return (
     <>
-      {data &&
-        data.length > 0 && ( //** */
-          <div className="overflow-x-auto w-full  min-w-full">
-            <table className="border-collapse table-auto w-full">
-              <thead>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th
-                        key={header.id}
-                        onClick={header.column.getToggleSortingHandler()}
-                        className={`py-1 px-1 border-[0.5px] border-slate-300 dark:border-slate-500 text-left text-gray-800 dark:text-gray-200 font-sans text-sm  ${
-                          headerColorMapping[
-                            header.column.id as headerColorMappingType
-                          ] || "bg-slate-200 dark:bg-slate-600"
-                        }`}
-                      >
-                        {!header.isPlaceholder && (
-                          <div className="flex items-center justify-between">
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                            {header.column.getCanSort() ? (
-                              header.column.getIsSorted() ? (
-                                <span className="ml-1">
-                                  {header.column.getIsSorted() === "desc" ? (
-                                    <IconButton classes={iconClasses}>
-                                      <LiaSortAmountDownSolid
-                                        size={20}
-                                        className={`${
-                                          headerColorMapping[
-                                            header.column
-                                              .id as headerColorMappingType
-                                          ]
-                                            ? "dark:text-gray-600"
-                                            : ""
-                                        }`}
-                                      />
-                                    </IconButton>
-                                  ) : (
-                                    <IconButton classes={iconClasses}>
-                                      <LiaSortAmountDownAltSolid
-                                        size={20}
-                                        className={`${
-                                          headerColorMapping[
-                                            header.column
-                                              .id as headerColorMappingType
-                                          ]
-                                            ? "dark:text-gray-600"
-                                            : ""
-                                        }`}
-                                      />
-                                    </IconButton>
-                                  )}
-                                </span>
-                              ) : (
-                                <span className="ml-1">
+      {selectedNode && status === "succeeded" && (
+        <div className="overflow-x-auto w-full  min-w-full">
+          <table className="border-collapse table-auto w-full">
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      onClick={header.column.getToggleSortingHandler()}
+                      className={`py-1 px-1 border-[0.5px] border-slate-300 dark:border-slate-500 text-left text-gray-800 dark:text-gray-200 font-sans text-sm  ${
+                        headerColorMapping[
+                          header.column.id as headerColorMappingType
+                        ] || "bg-slate-200 dark:bg-slate-600"
+                      }`}
+                    >
+                      {!header.isPlaceholder && (
+                        <div className="flex items-center justify-between">
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          {header.column.getCanSort() ? (
+                            header.column.getIsSorted() ? (
+                              <span className="ml-1">
+                                {header.column.getIsSorted() === "desc" ? (
                                   <IconButton classes={iconClasses}>
-                                    <LiaSortSolid
+                                    <LiaSortAmountDownSolid
                                       size={20}
                                       className={`${
                                         headerColorMapping[
@@ -385,110 +359,141 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
                                       }`}
                                     />
                                   </IconButton>
-                                </span>
-                              )
-                            ) : (
-                              ""
-                            )}
-                          </div>
-                        )}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody>
-                {table.getRowModel().rows.length > 0 ? (
-                  table.getRowModel().rows.map((row) => (
-                    <React.Fragment key={row.id}>
-                      <tr
-                        key={row.id}
-                        className={`${
-                          row.original.LandLayer != null
-                            ? "bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-red-300 hover:dark:bg-red-300"
-                            : "bg-gray-200 dark:bg-gray-600 border-b dark:border-gray-400 hover:bg-sky-100 dark:hover:bg-sky-400"
-                        }`}
-                        onClick={(e) => handleRowClick(row, e.currentTarget)}
-                        onMouseEnter={() => handleMouseEnter(row)}
-                        onMouseLeave={() => handleMouseLeave(row)}
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <td
-                            key={cell.id}
-                            className={`py-1 ${
-                              cell.column.id === "LandId" ? "px-1" : "px-2"
-                            }  font-extralight text-sm text-gray-700 dark:text-gray-300`}
-                          >
-                            {cell.column.id === "LandId" ? (
-                              <span
-                                {...{
-                                  onClick: () => handleRowExpand(row.id),
-                                  style: { cursor: "pointer" },
-                                }}
-                              >
-                                {expanded[row.id] ? (
-                                  <IconButton classes={iconClasses}>
-                                    <IoIosArrowUp size={20} />
-                                  </IconButton>
                                 ) : (
                                   <IconButton classes={iconClasses}>
-                                    <IoIosArrowDown size={20} />
+                                    <LiaSortAmountDownAltSolid
+                                      size={20}
+                                      className={`${
+                                        headerColorMapping[
+                                          header.column
+                                            .id as headerColorMappingType
+                                        ]
+                                          ? "dark:text-gray-600"
+                                          : ""
+                                      }`}
+                                    />
                                   </IconButton>
                                 )}
                               </span>
                             ) : (
-                              flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                              )
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                      {expanded[row.id] && row.original.HasSubRows && (
-                        <tr>
-                          <td colSpan={columns.length}>
-                            <SubSubRow land={row.original.SubContent[0]} />
-                            {/* need to check here *** */}
-                          </td>
-                        </tr>
+                              <span className="ml-1">
+                                <IconButton classes={iconClasses}>
+                                  <LiaSortSolid
+                                    size={20}
+                                    className={`${
+                                      headerColorMapping[
+                                        header.column
+                                          .id as headerColorMappingType
+                                      ]
+                                        ? "dark:text-gray-600"
+                                        : ""
+                                    }`}
+                                  />
+                                </IconButton>
+                              </span>
+                            )
+                          ) : (
+                            ""
+                          )}
+                        </div>
                       )}
-                    </React.Fragment>
-                  ))
-                ) : (
-                  <tr className="bg-gray-50 dark:bg-gray-800">
-                    <td
-                      colSpan={columns.length}
-                      className="text-left text-sm py-3 px-6 text-gray-700 dark:text-gray-300"
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.length > 0 ? (
+                table.getRowModel().rows.map((row) => (
+                  <React.Fragment key={row.id}>
+                    <tr
+                      key={row.id}
+                      className={`${
+                        row.original.LandLayer != null
+                          ? "bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-red-300 hover:dark:bg-red-300"
+                          : "bg-gray-200 dark:bg-gray-600 border-b dark:border-gray-400 hover:bg-sky-100 dark:hover:bg-sky-400"
+                      }`}
+                      onClick={(e) => handleRowClick(row, e.currentTarget)}
+                      onMouseEnter={() => handleMouseEnter(row)}
+                      onMouseLeave={() => handleMouseLeave(row)}
                     >
-                      {t("landSummaryTable:no_data")}
+                      {row.getVisibleCells().map((cell) => (
+                        <td
+                          key={cell.id}
+                          className={`py-1 ${
+                            cell.column.id === "LandId" ? "px-1" : "px-2"
+                          }  font-extralight text-sm text-gray-700 dark:text-gray-300`}
+                        >
+                          {cell.column.id === "LandId" ? (
+                            <span
+                              {...{
+                                onClick: () => handleRowExpand(row.id),
+                                style: { cursor: "pointer" },
+                              }}
+                            >
+                              {expanded[row.id] ? (
+                                <IconButton classes={iconClasses}>
+                                  <IoIosArrowUp size={20} />
+                                </IconButton>
+                              ) : (
+                                <IconButton classes={iconClasses}>
+                                  <IoIosArrowDown size={20} />
+                                </IconButton>
+                              )}
+                            </span>
+                          ) : (
+                            flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                    {expanded[row.id] && row.original.HasSubRows && (
+                      <tr>
+                        <td colSpan={columns.length}>
+                          <SubSubRow land={row.original.SubContent[0]} />
+                          {/* need to check here *** */}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))
+              ) : (
+                <tr className="bg-gray-50 dark:bg-gray-800">
+                  <td
+                    colSpan={columns.length}
+                    className="text-left text-sm py-3 px-6 text-gray-700 dark:text-gray-300"
+                  >
+                    {t("landSummaryTable:no_data")}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+            <tfoot>
+              {table.getFooterGroups().map((footerGroup) => (
+                <tr key={footerGroup.id}>
+                  {footerGroup.headers.map((header) => (
+                    <td
+                      key={header.id}
+                      className="py-1 px-3 text-left text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm bg-gray-400 dark:bg-gray-600"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.footer,
+                            header.getContext()
+                          )}
                     </td>
-                  </tr>
-                )}
-              </tbody>
-              <tfoot>
-                {table.getFooterGroups().map((footerGroup) => (
-                  <tr key={footerGroup.id}>
-                    {footerGroup.headers.map((header) => (
-                      <td
-                        key={header.id}
-                        className="py-1 px-3 text-left text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm bg-gray-400 dark:bg-gray-600"
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.footer,
-                              header.getContext()
-                            )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tfoot>
-            </table>
-            <Pagination table={table} />
-          </div>
-        )}
+                  ))}
+                </tr>
+              ))}
+            </tfoot>
+          </table>
+          <Pagination table={table} />
+        </div>
+      )}
     </>
   );
 };

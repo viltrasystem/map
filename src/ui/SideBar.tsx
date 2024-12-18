@@ -6,6 +6,8 @@ import IconButton from "./IconButton";
 import { MouseEventHandler, useRef } from "react";
 import { FaDownload } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
+import { useAppSelector } from "../app/hook";
+import { RootState } from "../app/store";
 
 export type PrintInfo = {
   title: string;
@@ -26,10 +28,10 @@ const SideBar: React.FC<SideBarProps> = ({
   //   (state: RootState) => state.mapLegend.legendUrl
   // );
 
-  // const isSidebarVisible: boolean = useAppSelector(
-  //   (state: RootState) => state.sideBar.isSidebarVisible
-  // );
-  const isSidebarVisible = true;
+  const isSidebarVisible: boolean = useAppSelector(
+    (state: RootState) => state.sideBar.isSidebarVisible
+  );
+  //const isSidebarVisible = true;
 
   const printBtnclickHandler: MouseEventHandler<
     HTMLButtonElement

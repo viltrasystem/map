@@ -11,7 +11,7 @@ export type ArchiveInfo = {
 };
 
 interface LandState {
-  landDetails: LandObj | null;
+  landDetails: LandObj | undefined;
   landLayers: any[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | undefined;
@@ -24,7 +24,7 @@ interface LandState {
 }
 
 const initialState: LandState = {
-  landDetails: null,
+  landDetails: undefined,
   landLayers: [],
   status: "idle",
   error: undefined,
@@ -58,7 +58,6 @@ const unitLandLayerSlice = createSlice({
           state.status = "succeeded";
           const landLayerArray: any[] = [];
           const { data, locale } = action.payload;
-          debugger;
           // Use the locale for LocalizeNumber
           state.landDetails = {
             TotalLandsCount: data.TotalLandsCount,
@@ -195,8 +194,3 @@ const unitLandLayerSlice = createSlice({
 
 //export const { setSelectedUnitLayerState } = unitLandLayerSlice.actions;
 export default unitLandLayerSlice.reducer;
-
-export type UnitLand = {
-  unitId: number;
-  locale: string;
-};

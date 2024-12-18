@@ -3,7 +3,7 @@ import React from "react";
 import { useAppSelector } from "../app/hook";
 import { RootState } from "../app/store";
 
-const LoadingModal: React.FC = () => {
+const LoadingModal = React.memo(() => {
   const { isLoading } = useAppSelector((state: RootState) => state.loading);
   //if (isLoading || isLoading === undefined) return null;
   return (
@@ -21,7 +21,7 @@ const LoadingModal: React.FC = () => {
       )}
     </>
   );
-};
+});
 
 export default LoadingModal;
 

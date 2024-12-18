@@ -3,6 +3,7 @@ import topoThumbnail from "../assets/images/base-topo.png";
 import topograatoneThumbnail from "../assets/images/base-topograatone.png";
 import sjokartrasterThumbnail from "../assets/images/base-sjokartraster.png";
 import toporasterThumbnail from "../assets/images/base-toporaster.png";
+import osmThumbnail from "../assets/images/osm.png";
 import { useAppSelector } from "../app/hook";
 import { RootState } from "../app/store";
 
@@ -33,6 +34,9 @@ const LayerSelection: React.FC<ChildProps> = ({ toggleBaseLayer }) => {
         break;
       case "sjokartraster":
         setSelectedLayerImageSource(sjokartrasterThumbnail);
+        break;
+      case "osm":
+        setSelectedLayerImageSource(osmThumbnail);
         break;
       default:
         setSelectedLayerImageSource(topoThumbnail);
@@ -117,6 +121,18 @@ const LayerSelection: React.FC<ChildProps> = ({ toggleBaseLayer }) => {
                   : "border-gray-300"
               } w-16 h-16 cursor-pointer border-2 hover:border-orange-300 hover:border-3 focus:border-orange-400 transition-transform duration-500 transform hover:scale-110`}
               onClick={() => onLayerSelect("sjokartraster")}
+            />
+          </li>
+          <li>
+            <img
+              src={osmThumbnail}
+              alt="Street Layer"
+              className={`${
+                selectedLayer === "osm"
+                  ? "border-blue-400 border-3 shadow-2xl"
+                  : "border-gray-300"
+              } w-16 h-16 cursor-pointer border-2 hover:border-orange-300 hover:border-3 focus:border-orange-400 transition-transform duration-500 transform hover:scale-110`}
+              onClick={() => onLayerSelect("osm")}
             />
           </li>
         </ul>

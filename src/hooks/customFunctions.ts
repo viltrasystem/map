@@ -23,7 +23,6 @@ export function updateChildren(
     //  console.log(child, "child each");
     return child;
   });
-  console.log(childrenState, "children return");
   return childrenState;
 }
 

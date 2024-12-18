@@ -2,11 +2,6 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { landSummary, archiveLand } from "../thunk/landSummaryThunk";
 import { formatNumber } from "../lib/helpFunction";
 
-// export type summaryInfo = {
-//   unitId: number;
-//   summaryType: string;
-// };
-
 export type ArchiveInfo = {
   unitId: number;
   landId: number;
@@ -47,7 +42,6 @@ const landSummarySlice = createSlice({
         (state, action: PayloadAction<{ data: LandObj; locale: string }>) => {
           state.status = "succeeded";
           const { data, locale } = action.payload;
-          debugger;
           // Use the locale for LocalizeNumber
           state.landDetails = {
             TotalLandsCount: data.TotalLandsCount,

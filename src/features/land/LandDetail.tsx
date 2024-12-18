@@ -17,8 +17,6 @@ import {
   FilterFn,
 } from "@tanstack/react-table";
 import { toast } from "react-toastify";
-//import { rankItem } from "@tanstack/match-sorter-utils";
-//import { matchSorter } from "match-sorter";
 import { ArchiveInfo, LandInfo } from "../../slices/landSummarySlice";
 import { archiveLand, landSummary } from "../../thunk/landSummaryThunk";
 import { setLoadingState } from "../../slices/loadingSlice";
@@ -34,7 +32,7 @@ import { debounce } from "lodash";
 import { TbEdit } from "react-icons/tb";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { setGlobalFilter } from "../../slices/filterSlice";
-import { OwnedLand } from "../../slices/landOwnersSlice";
+import { OwnedLand } from "../../lib/types";
 import { FaRegMap } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
 import LoadingModal from "../../ui/LoadingModal";
@@ -74,11 +72,17 @@ const LandDetail: React.FC<ToggleStateProps> = ({
   const globalFilter = useAppSelector(
     (state: RootState) => state.filter.globalFilter
   );
-  const { summaryInfo } = useAppSelector((state: RootState) => state.summary);
   const { landDetails } = useAppSelector(
     (state: RootState) => state.landSummary
   );
-  const { rootNode } = useAppSelector((state: RootState) => state.tree);
+  const { selectedNode, rootNode } = useAppSelector(
+    (state: RootState) => ({
+      selectedNode: state.tree.selectedNode,
+      rootNode: state.tree.rootNode,
+    }),
+    (prev, next) =>
+      prev.selectedNode === next.selectedNode && prev.rootNode === next.rootNode
+  );
   const { user } = useAppSelector((state: RootState) => state.auth);
   const [isLandWindowOpen, setIsLandWindowOpen] = useState<boolean>(false);
   const [landDetailReq, setLandDetailReq] = useState<LandDetailReq | undefined>(
@@ -115,9 +119,9 @@ const LandDetail: React.FC<ToggleStateProps> = ({
   }, [landWindowOpen]);
 
   useEffect(() => {
-    if (summaryInfo.unitId > 0 && !isLandWindowOpen) {
+    if (selectedNode && selectedNode.UnitID > 0 && !isLandWindowOpen) {
       const landReq: OwnedLand = {
-        unitId: summaryInfo.unitId,
+        unitId: selectedNode.UnitID,
         userId: user.UserId,
         isDnnId: true,
         isLandTab: toggleState,
@@ -126,7 +130,7 @@ const LandDetail: React.FC<ToggleStateProps> = ({
       dispatch(setLoadingState(true));
       dispatch(landSummary(landReq));
     }
-  }, [summaryInfo.unitId, isLandWindowOpen, toggleState, language]);
+  }, [selectedNode, user, isLandWindowOpen, toggleState, dispatch, language]);
 
   useEffect(() => {
     if (landDetails) {
@@ -336,11 +340,11 @@ const LandDetail: React.FC<ToggleStateProps> = ({
     // autoResetPageIndex: false, // turn off page index reset when sorting or filtering
   });
 
-  const handleRowExpand = (rowId: any) => {
+  const handleRowExpand = (rowId: string) => {
     pageIndexRef.current = table.getState().pagination.pageIndex;
     setData((prevData) => {
       const updatedData = prevData?.map((item, index) => {
-        if (index == rowId) {
+        if (index == Number(rowId)) {
           return {
             ...item,
             HasSubRows: item.HasSubRows ? true : false,
@@ -395,7 +399,7 @@ const LandDetail: React.FC<ToggleStateProps> = ({
   };
 
   const handleMapView = (original: LandInfo): void => {
-    const mapUrl = `/land_mapping/${summaryInfo.unitId}/${rootNode.UnitID}/${user.UserId}/${original.LandId}/${original.Municipality}/${original.MainNo}/${original.SubNo}`;
+    const mapUrl = `/land_mapping/${rootNode.UnitID}/${selectedNode?.UnitID}/${user.UserId}/${original.LandId}/${original.Municipality}/${original.MainNo}/${original.SubNo}`;
     navigate(mapUrl, { state: { from: location } });
   };
 
@@ -415,7 +419,7 @@ const LandDetail: React.FC<ToggleStateProps> = ({
           onConfirm={() => {
             console.log(original.Municipality, "Confirmed!");
             const archiveInfo: ArchiveInfo = {
-              unitId: summaryInfo.unitId,
+              unitId: Number(selectedNode?.UnitID), //*** need to check with main */
               landId: original.LandId,
               deletedBy: user.UserId,
               locale: language,
@@ -456,7 +460,7 @@ const LandDetail: React.FC<ToggleStateProps> = ({
   if (isLoading) return <LoadingModal />;
   return (
     <>
-      {summaryInfo.unitId > 0 && (
+      {selectedNode && selectedNode.UnitID > 0 && landDetails && (
         <div className="overflow-x-auto w-full  min-w-full">
           <table className="border-collapse table-auto w-full">
             <thead>

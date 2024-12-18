@@ -12,7 +12,6 @@ import { useAppDispatch, useAppSelector } from "../../app/hook";
 import Input from "../../ui/Input";
 import { z } from "zod";
 import { RootState } from "../../app/store";
-
 import { useTranslation } from "react-i18next";
 import DarkModeToggle from "../../ui/DarkModeToggle";
 import TranslationToggle from "../../ui/TranslationToggle";
@@ -24,19 +23,22 @@ import _ from "lodash";
 import { HiOutlineXMark } from "react-icons/hi2";
 import IconButton from "../../ui/IconButton";
 import { wordExistsInUri } from "../../lib/helpFunction";
+import { setSelectedLayerState } from "../../slices/selectedLayerSlice";
+import { setSelectedTab } from "../../slices/tabSelectionSlice";
 
 interface LandSelectorProps {
   isLandSelectorModalIsOpen?: boolean;
   landSelectorModalClose?: () => void;
+  onSelectedLayerLoad?: () => void;
 }
 
 const LandSelector: React.FC<LandSelectorProps> = ({
   isLandSelectorModalIsOpen,
   landSelectorModalClose,
+  onSelectedLayerLoad,
 }: LandSelectorProps) => {
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [valuesSet, setValuesSet] = useState(false);
-  const [LandExist, setLandExist] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<
     Municipality | null | undefined
@@ -53,16 +55,10 @@ const LandSelector: React.FC<LandSelectorProps> = ({
 
   type TLandSelectorSchema = z.infer<typeof landSelectorSchema>;
   const dispatch = useAppDispatch();
-  const {
-    //land,
-    landList,
-    isloaded,
-    //isLandAvailable,
-    noContent,
-    isLoading,
-    //error,
-    isError,
-  } = useAppSelector((state: RootState) => state.selectland);
+  const { landList, isloaded, noContent, isLoading, isError } = useAppSelector(
+    (state: RootState) => state.selectland
+  );
+
   const {
     isMapping,
     rootId,
@@ -132,13 +128,10 @@ const LandSelector: React.FC<LandSelectorProps> = ({
 
   const labelClasses: string =
     "pointer-events-none flex h-full w-full select-none text-sm font-normal";
-  // "absolute left-0 -top-3.5 text-neutral-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-neutral-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-800 peer-focus:text-sm";
   const inputClasses: string =
-    "h-full w-full rounded-md border border-gray-300 bg-transparent  px-3 py-2 font-sans text-sm font-normal outline outline-0 transition-all focus:placeholder-opacity-0 focus:border-customBlue  focus:outline-0 text-gray-800 bg-gray-100 dark:text-gray-200 dark:bg-slate-800"; // disabled:border-0
-  /// "peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:outline-none focus:border-blue-600 bg-transparent";
+    "h-full w-full rounded-md border border-gray-300 bg-transparent  px-3 py-2 font-sans text-sm font-normal outline outline-0 transition-all focus:placeholder-opacity-0 focus:border-customBlue  focus:outline-0 text-gray-800 bg-gray-100 dark:text-gray-200 dark:bg-slate-800";
   const errorLineClasses: string =
     "absolute left-2 top-[64px] inline-block text-rose-400 text-[11px]";
-  //const errorSummeryClasses: string = "inline-block text-rose-600 text-sm";
 
   console.log(
     isMapping,
@@ -214,7 +207,16 @@ const LandSelector: React.FC<LandSelectorProps> = ({
         }
       }
     }
-  }, [manucipilityList, municipality, mainNo, subNo, setValue, trigger]);
+  }, [
+    manucipilityList,
+    isMapping,
+    landList,
+    municipality,
+    mainNo,
+    subNo,
+    setValue,
+    trigger,
+  ]);
 
   const onSubmit: SubmitHandler<TLandSelectorSchema> = async (data) => {
     const land = {
@@ -233,12 +235,24 @@ const LandSelector: React.FC<LandSelectorProps> = ({
       };
       dispatch(setselectedLandState(land));
       dispatch(loadLand(landObj));
-      //dispatch(setLoadingState(true));
       setIsFormSubmitted(true);
-      setLandExist(false);
     } else {
-      setLandExist(true);
+      if (onSelectedLayerLoad) {
+        const layerString = `${land.mainNo}/${land.subNo}`;
+        dispatch(
+          setSelectedLayerState({
+            isClicked: true,
+            isMouseEnter: false,
+            layerName: layerString,
+          })
+        );
+        onSelectedLayerLoad();
+        if (landSelectorModalClose) {
+          landSelectorModalClose();
+        }
+      }
     }
+    dispatch(setSelectedTab("selectedLand"));
   };
 
   useEffect(() => {
@@ -255,8 +269,6 @@ const LandSelector: React.FC<LandSelectorProps> = ({
   const navigate = useNavigate();
   useEffect(() => {
     if (isFormSubmitted && isloaded && !noContent && !isError) {
-      //dispatch(setselectedLandState(land)); // Dispatch action to update land in Redux state
-
       if (landSelectorModalClose) {
         landSelectorModalClose();
       }
@@ -265,7 +277,15 @@ const LandSelector: React.FC<LandSelectorProps> = ({
         navigate(`/dashboard`);
       }
     }
-  }, [isFormSubmitted, isloaded, navigate, dispatch, isError]);
+  }, [
+    isFormSubmitted,
+    isloaded,
+    navigate,
+    dispatch,
+    isError,
+    landSelectorModalClose,
+    noContent,
+  ]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -301,7 +321,6 @@ const LandSelector: React.FC<LandSelectorProps> = ({
   );
   const errorSummeryClasses: string = "inline-block text-rose-600 text-sm";
 
-  //if (municipalityLoading) return <Spinner />;
   if (!isLandSelectorModalIsOpen && landId === 0) return null;
 
   return (
@@ -335,11 +354,6 @@ const LandSelector: React.FC<LandSelectorProps> = ({
                 {municipalityError && (
                   <ErrorTxt classes={`${errorSummeryClasses} pb-2`}>
                     {t("landSelector:sever_error")}
-                  </ErrorTxt>
-                )}
-                {LandExist && (
-                  <ErrorTxt classes={`${errorSummeryClasses} pb-2`}>
-                    {t("landSelector:land_exist_error")}
                   </ErrorTxt>
                 )}
                 {isFormSubmitted && isloaded && noContent && !isError && (
@@ -462,9 +476,9 @@ const LandSelector: React.FC<LandSelectorProps> = ({
                         </button>
                       )}
                   </div>
-                  <div className="absolute top-[64px] left-0  z-50 w-full">
+                  <div className="absolute top-[64px] left-0  z-50 w-full max-h-44 overflow-y-auto slim-scroll">
                     {showItemList && manucipilityList && (
-                      <ul className="border rounded-md bg-white text-gray-600 focus:ring-2 shadow-lg">
+                      <ul className="border rounded-md bg-white dark:bg-slate-500 text-gray-600 dark:text-slate-200 focus:ring-2 shadow-lg">
                         {filteredMunicipalityList
                           ? filteredMunicipalityList.map((item) => (
                               <li
@@ -573,11 +587,11 @@ const LandSelector: React.FC<LandSelectorProps> = ({
                 </div>
                 <div className="flex  w-1/2 justify-center m-auto">
                   <Button type="submit" disabled={false}>
-                    {!false ? (
+                    {!isLoading ? (
                       t("landSelector:btn_text")
                     ) : (
                       <div className="grid grid-flow-col justify-items-end">
-                        <p> t("landSelector:btn_text")</p>
+                        <p> {t("landSelector:btn_text")}</p>
                         <p>
                           <SpinnerMini />
                         </p>
