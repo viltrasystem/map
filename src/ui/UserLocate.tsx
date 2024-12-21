@@ -73,10 +73,8 @@ const UserLocate: React.FC<UserLocateProp> = ({ setUserLocation }) => {
       className={`rounded-full p-[4px] w-8 h-8 flex items-center justify-center ${
         isTracking
           ? "text-green-600 hover:text-green-300 dark:text-green-600 dark:hover:text-green-300 bg-gray-300"
-          : "text-gray-800 hover:text-gray-100 dark:text-tblColora dark:hover:text-gray-800"
-      } hover:bg-gray-400 hover:ring-gray-600
-          dark:hover:bg-gray-400 
-        dark:focus:ring-gray-800 dark:hover:ring-gray-600 transition duration-300`}
+          : "text-gray-800 dark:text-gray-800  hover:text-gray-100 dark:hover:text-gray-100 hover:bg-gray-400 dark:hover:bg-gray-600"
+      }  transition duration-300`}
     >
       <FaLocationCrosshairs size={25} />
     </button>

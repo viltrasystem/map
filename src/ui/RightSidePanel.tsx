@@ -7,8 +7,10 @@ import DarkModeToggle from "./DarkModeToggle";
 import TranslationToggle from "./TranslationToggle";
 import { MemorizedUnitList } from "../features/userUnit/UnitList";
 import { MemorizedTree } from "../features/userUnit/Tree";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import ErrorBoundary from "../error/errorBoundary";
+import { useAppSelector } from "../app/hook";
+import { RootState } from "../app/store";
 
 interface RightSidePanelProps {
   isOpen: boolean;
@@ -27,6 +29,14 @@ const RightSidePanel: React.FC<RightSidePanelProps> = ({
   //   "panelRectY",
   //   0
   // );
+  const { status, isCompleted } = useAppSelector(
+    (state: RootState) => ({
+      status: state.unitLandLayer.status,
+      isCompleted: state.unitLandLayer.isCompleted,
+    }),
+    (prev, next) =>
+      prev.status === next.status && prev.isCompleted === next.isCompleted
+  );
 
   const panelRef = useRef<HTMLDivElement | null>(null);
   // useEffect(() => {
@@ -37,18 +47,23 @@ const RightSidePanel: React.FC<RightSidePanelProps> = ({
   //     //  console.log("close");
   //   };
   // }, [isOpen]);
+  useEffect(() => {
+    if (status === "succeeded" && isCompleted) {
+      onClosePanel();
+    }
+  }, [isCompleted]);
 
   return (
     <>
       {isOpen && (
         <div
           ref={panelRef}
-          className="SidePanel absolute top-0 right-0 h-full overflow-y-scroll bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 w-72 shadow-lg z-20 rounded-tl-lg rounded-bl-lg pl-2 pt-2"
+          className="SidePanel absolute top-0 right-0 h-full overflow-y-auto bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 w-72 shadow-lg z-20 rounded-tl-lg rounded-bl-lg pl-2 pt-2"
         >
           {/* right side panel content goes here */}
           {/* <h1>{t("rightsidepanel.abc")}</h1>
           <p>{t("welcome.message")}</p> */}
-          <div className="flex  justify-evenly space-x-1 pe-4">
+          <div className="flex  justify-end space-x-2 me-2">
             <DarkModeToggle />
             <TranslationToggle />
             <IconButton onClick={onClosePanel}>

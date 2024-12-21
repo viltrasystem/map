@@ -54,6 +54,7 @@ import { LandUnitInfo } from "../../slices/landSummarySlice";
 import ToolTip from "../../ui/ToolTip";
 import { FaInfoCircle } from "react-icons/fa";
 import ErrorToggle from "./ErrorToggle";
+import { GiDeer } from "react-icons/gi";
 
 interface LandProps {
   landDetailReq: LandDetailReq;
@@ -697,15 +698,25 @@ export const Land: React.FC<LandProps> = ({
         aria-modal="true"
       >
         <div className="h-[40rem] max-h-fit min-w-full flex-wrap items-start justify-center text-neutral-800 font-light rounded-lg shadow-2xl bg-neutral-100 dark:text-gray-200 dark:bg-slate-700">
-          <div className={`flex justify-between items-center pt-2 px-3`}>
-            <div className="flex-1 flex justify-center font-serif">
-              <Heading headingElement="h4" headingTxt={t("land:title")} />
-            </div>
-            <div className="h-1/2">
+          <div className="flex justify-between items-center pt-3 px-4">
+            <span className="bg-logo flex-shrink-0">
+              <GiDeer className="w-8 h-8 sm:w-8 sm:h-8" />
+            </span>
+            <h1
+              className="text-base font-medium text-gradient
+               sm:text-lg sm:font-medium 
+               md:text-xl md:font-medium 
+               lg:text-2xl lg:font-medium 
+               xl:text-2xl xl:font-medium 
+               text-center flex-grow"
+            >
+              {t("land:title")}{" "}
+            </h1>
+            <span className="flex-shrink-0">
               <IconButton onClick={landModalWindowClose} classes={iconClasses}>
                 <HiOutlineXMark size={20} width={10} />
               </IconButton>
-            </div>
+            </span>
           </div>
           {isLoading && landDetail === undefined && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">

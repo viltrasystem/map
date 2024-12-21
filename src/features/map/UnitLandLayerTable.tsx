@@ -48,7 +48,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
   });
   const selectedRowRef = useRef<HTMLTableRowElement | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [data, setData] = useState<LandInfo[] | undefined>(undefined);
+  const [data, setData] = useState<LandInfo[] | undefined>([]);
   const globalFilter = useAppSelector(
     (state: RootState) => state.filter.globalFilter
   );
@@ -63,21 +63,28 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
   );
 
   const { landDetails, status } = useAppSelector(
-    (state: RootState) => state.unitLandLayer
+    (state: RootState) => ({
+      landDetails: state.unitLandLayer.landDetails,
+      status: state.unitLandLayer.status,
+    }),
+    (prev, next) =>
+      prev.landDetails === next.landDetails && prev.status === next.status
   );
 
   const pageIndexRef = useRef(pagination.pageIndex);
   const { isLoading } = useAppSelector((state: RootState) => state.loading);
 
   const iconClasses: IconClasses = {
-    padding_x: "px-[2px]",
+    padding_x: "xs:px-[1px] sm:px-[2px]",
     background_color:
       "hover:bg-slate-50 active:bg-slate-50 ring-slate-50 dark:hover:bg-slate-50 dark:hover:ring-slate-50 dark:active:bg-slate-50 dark:active:ring-slate-50",
   };
 
   useEffect(() => {
-    if (landDetails !== undefined) {
+    if (landDetails) {
       setData(landDetails.Lands);
+    } else {
+      setData([]);
     }
   }, [landDetails]);
 
@@ -321,8 +328,10 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
   return (
     <>
       {selectedNode && status === "succeeded" && (
-        <div className="overflow-x-auto w-full  min-w-full">
-          <table className="border-collapse table-auto w-full">
+        // <div className="overflow-x-auto w-full  min-w-full">
+        //   <table className="border-collapse table-auto w-full">
+        <div className="w-full h-full overflow-auto border rounded-md shadow-md">
+          <table className="border-collapse min-w-full min-h-full">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
@@ -330,7 +339,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
                     <th
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}
-                      className={`py-1 px-1 border-[0.5px] border-slate-300 dark:border-slate-500 text-left text-gray-800 dark:text-gray-200 font-sans text-sm  ${
+                      className={`xs:py-[2px] xs:px-[2px] md:px-3 md:py-2 font-sans xs:font-extralight md:font-medium xs:text-[9px] sx:text-[0.75rem] md:text-sm lg:text-base xs:text-center md:text-left border-[0.5px] border-slate-300 dark:border-slate-500 text-gray-800 dark:text-gray-200 ${
                         headerColorMapping[
                           header.column.id as headerColorMappingType
                         ] || "bg-slate-200 dark:bg-slate-600"
@@ -348,7 +357,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
                                 {header.column.getIsSorted() === "desc" ? (
                                   <IconButton classes={iconClasses}>
                                     <LiaSortAmountDownSolid
-                                      size={20}
+                                      // size={20}
                                       className={`${
                                         headerColorMapping[
                                           header.column
@@ -362,7 +371,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
                                 ) : (
                                   <IconButton classes={iconClasses}>
                                     <LiaSortAmountDownAltSolid
-                                      size={20}
+                                      // size={20}
                                       className={`${
                                         headerColorMapping[
                                           header.column
@@ -379,7 +388,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
                               <span className="ml-1">
                                 <IconButton classes={iconClasses}>
                                   <LiaSortSolid
-                                    size={20}
+                                    // size={20}
                                     className={`${
                                       headerColorMapping[
                                         header.column
@@ -412,7 +421,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
                         row.original.LandLayer != null
                           ? "bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-red-300 hover:dark:bg-red-300"
                           : "bg-gray-200 dark:bg-gray-600 border-b dark:border-gray-400 hover:bg-sky-100 dark:hover:bg-sky-400"
-                      }`}
+                      } xs:py-[2px] xs:px-[2px] md:px-3 md:py-2 font-sans xs:font-extralight md:font-medium xs:text-[9px] sx:text-[0.75rem] md:text-sm xs:text-center md:text-left`}
                       onClick={(e) => handleRowClick(row, e.currentTarget)}
                       onMouseEnter={() => handleMouseEnter(row)}
                       onMouseLeave={() => handleMouseLeave(row)}
@@ -422,7 +431,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
                           key={cell.id}
                           className={`py-1 ${
                             cell.column.id === "LandId" ? "px-1" : "px-2"
-                          }  font-extralight text-sm text-gray-700 dark:text-gray-300`}
+                          }  text-gray-700 dark:text-gray-300`}
                         >
                           {cell.column.id === "LandId" ? (
                             <span
@@ -464,7 +473,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
                 <tr className="bg-gray-50 dark:bg-gray-800">
                   <td
                     colSpan={columns.length}
-                    className="text-left text-sm py-3 px-6 text-gray-700 dark:text-gray-300"
+                    className="text-left py-3 px-6 xs:font-extralight md:font-medium xs:text-[10px] sx:text-[0.75rem] md:text-sm text-gray-700 dark:text-gray-300"
                   >
                     {t("landSummaryTable:no_data")}
                   </td>
@@ -477,7 +486,7 @@ const UnitLandLayerTable: React.FC<UnitLandTableProps> = ({
                   {footerGroup.headers.map((header) => (
                     <td
                       key={header.id}
-                      className="py-1 px-3 text-left text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm bg-gray-400 dark:bg-gray-600"
+                      className="py-1 px-3 xs:font-extralight md:font-medium xs:text-[10px] sx:text-[0.80rem] md:text-sm lg:text-base xs:text-center md:text-left text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm bg-gray-400 dark:bg-gray-600"
                     >
                       {header.isPlaceholder
                         ? null

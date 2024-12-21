@@ -67,6 +67,7 @@ import { click } from "ol/events/condition";
 import { setSideBarVisibility } from "../../slices/sideBarSlice";
 import { getFeatureStyle, getAccuracyStyle } from "../../lib/featureStyle";
 import SpinnerMini from "../../ui/SpinnerMini";
+import { fetchComplete } from "../../slices/unitLandLayerSlice";
 
 type MapWrapperProps = {};
 export interface MapWrapperRef {
@@ -131,12 +132,14 @@ const MapWrapper = React.memo(
       // isError,
     } = useAppSelector((state: RootState) => state.selectland);
 
-    const {
-      landLayers,
-      status,
-      // error,
-      // isError,
-    } = useAppSelector((state: RootState) => state.unitLandLayer);
+    const { landLayers, status } = useAppSelector(
+      (state: RootState) => ({
+        landLayers: state.unitLandLayer.landLayers,
+        status: state.unitLandLayer.status,
+      }),
+      (prev, next) =>
+        prev.landLayers === next.landLayers && prev.status === next.status
+    );
 
     let selectedLand: any = null;
     const lastFeature: Record<string, Feature> = {};
@@ -1102,10 +1105,11 @@ const MapWrapper = React.memo(
               .getView()
               .fit(extent, { padding: [50, 50, 50, 50], duration: 2000 });
             if (selectedTab === "land") {
-              const targetZoom = 12;
+              const targetZoom = 10;
               setTimeout(() => {
                 if (map.getView().getZoom()) {
                   view.setZoom(targetZoom);
+                  dispatch(fetchComplete(true));
                 }
               }, 2000); // Wait for the `fit` animation to complete
             }

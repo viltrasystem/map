@@ -12,6 +12,7 @@ import { useGetChildUnitsQuery } from "../../services/treeApi";
 import { usePopper } from "react-popper";
 import store, { RootState } from "../../app/store";
 import { setSelectedTab } from "../../slices/tabSelectionSlice";
+import SpinnerMini from "../../ui/SpinnerMini";
 
 const initialContextMenu = {
   isOpen: false,
@@ -30,6 +31,12 @@ const Node: React.FC<NodeProps> = ({ label, unitId }) => {
   const dispatch = useAppDispatch();
   const { selectedNode, rootNode } = useAppSelector((state) => state.tree);
   const { user } = useAppSelector((state: RootState) => state.auth);
+  const { status } = useAppSelector(
+    (state: RootState) => ({
+      status: state.unitLandLayer.status,
+    }),
+    (prev, next) => prev.status === next.status
+  );
   const [contextMenu, setContextMenu] = useState(initialContextMenu);
 
   const [shouldFetchData, setShouldFetchData] = useState(false);
@@ -168,34 +175,49 @@ const Node: React.FC<NodeProps> = ({ label, unitId }) => {
           selectedNode?.UnitID === node?.UnitID
             ? "text-sky-500 dark:text-hoverBlue"
             : ""
-        } flex gap-1 h-5`}
+        } flex gap-1 h-5 ${
+          status === "loading" ? "opacity-80 pointer-events-none" : ""
+        }`}
       >
         <div>
           {node && node.ChildCount > 0 && (
             <button
               id={node.UnitID.toString()}
-              // data-node={JSON.stringify(node)}
-              onClick={handleExpand}
+              disabled={status === "loading"}
+              onClick={status !== "loading" ? handleExpand : undefined}
+              className={`text-[12px] cursor-pointer ${
+                status === "loading" ? "cursor-not-allowed" : ""
+              }`}
             >
-              <span className="text-[12px] cursor-pointer">
-                {node.IsExpanded ? "\u25BC" : "\u25BA"}
-              </span>
+              {status === "loading" &&
+              store.getState().tree.selectedNode?.UnitID === node.UnitID ? (
+                <SpinnerMini width={"w-4"} height={"h-4"} margin={"mt-[6px]"} />
+              ) : (
+                <span>{node.IsExpanded ? "\u25BC" : "\u25BA"}</span>
+              )}
             </button>
           )}
-          {node && node.ChildCount == 0 && (
-            <button>
-              <span className="text-[12px]">{`\u2014`}</span>
+          {node && node.ChildCount === 0 && (
+            <button
+              disabled={status === "loading"}
+              className={`text-[12px] ${
+                status === "loading" ? "cursor-not-allowed" : ""
+              }`}
+            >
+              <span>{`\u2014`}</span>
             </button>
           )}
         </div>
         <div
           id={unitId.toString()}
-          className="inline-block cursor-pointer text-[13px] mt-[4px]"
+          className={`inline-block cursor-pointer text-[13px] mt-[4px] ${
+            status === "loading" ? "cursor-not-allowed" : ""
+          }`}
           ref={referenceElement}
-          onContextMenu={handleContextMenu}
-          onClick={(e) => selectUnit(e)}
+          onContextMenu={status !== "loading" ? handleContextMenu : undefined}
+          onClick={status !== "loading" ? (e) => selectUnit(e) : undefined}
         >
-          <span className="cursor-pointer">{label}</span>
+          <span>{label}</span>
         </div>
       </div>
       {node?.UnitTypeID != 6 &&

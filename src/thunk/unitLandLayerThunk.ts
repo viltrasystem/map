@@ -18,18 +18,16 @@ export const loadUnitLandLayer = createAsyncThunk<
       const response = landReq.isLandTab
         ? await unitLandLayerApiService.loadUnitOwnersLandLayers(landReq)
         : await unitLandLayerApiService.loadUnitLandLayers(landReq.unitId);
-      if (response.data.StatusCode === 204) {
-        return { noContent: true };
-      }
       const currentRowsHeight =
         response.data?.Lands != null ? 4 + response.data?.Lands.length * 10 : 0;
       const initialHeight = currentRowsHeight > 20 ? 20 : currentRowsHeight;
       dispatch(setInitialHeightState(initialHeight));
-      if (response.status === 204) {
-        return { noContent: true };
-      }
       dispatch(setLoadingState(false));
-      return { data: response.data, locale: landReq.locale };
+      return {
+        noContent: response.data.Lands.length === 0,
+        data: response.data,
+        locale: landReq.locale,
+      };
     } catch (error) {
       dispatch(setLoadingState(false));
 

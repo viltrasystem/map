@@ -17,14 +17,14 @@ const Pagination = <T,>({ table }: PaginationProps<T>): JSX.Element => {
   );
 
   return (
-    <div className="flex justify-end items-center gap-2 mt-2 px-2">
+    <div className="flex justify-end items-center gap-2 mt-2 px-2 xs:px-[2px] md:px-2 font-sans xs:font-extralight md:font-medium xs:text-[10px] sx:text-sm lg:text-base">
       <IconButton
         onClick={() => table.setPageIndex(0)}
         disabled={!table.getCanPreviousPage()}
       >
         <HiOutlineChevronDoubleLeft
           className="text-sky-600 hover:text-sky-900 dark:text-sky-500 dark:hover:text-sky-700"
-          size={20}
+          // size={20}
         />
       </IconButton>
       <IconButton
@@ -33,7 +33,7 @@ const Pagination = <T,>({ table }: PaginationProps<T>): JSX.Element => {
       >
         <IoChevronBackSharp
           className="text-sky-600 hover:text-sky-900  dark:text-sky-500 dark:hover:text-sky-700"
-          size={20}
+          // size={20}
         />
       </IconButton>
       <IconButton
@@ -42,7 +42,7 @@ const Pagination = <T,>({ table }: PaginationProps<T>): JSX.Element => {
       >
         <IoChevronForwardSharp
           className="text-sky-600 hover:text-sky-900  dark:text-sky-500 dark:hover:text-sky-700"
-          size={20}
+          // size={20}
         />
       </IconButton>
       <IconButton
@@ -51,7 +51,7 @@ const Pagination = <T,>({ table }: PaginationProps<T>): JSX.Element => {
       >
         <HiOutlineChevronDoubleRight
           className="text-sky-600 hover:text-sky-900  dark:text-sky-500 dark:hover:text-sky-700"
-          size={20}
+          // size={20}
         />
       </IconButton>
       <span className="flex items-center gap-1 text-sky-600 dark:text-sky-500">
@@ -76,11 +76,11 @@ const Pagination = <T,>({ table }: PaginationProps<T>): JSX.Element => {
           onBlur={() => {
             table.setPageIndex(goToPageInput - 1);
           }}
-          className="w-12 p-[2px] h-full text-center rounded-md border-2 border-gray-300 dark:border-sky-500  bg-transparent font-sans text-sm font-normal outline outline-0 transition-all focus:placeholder-opacity-0 focus:border-customBlue focus:outline-0 text-slate-800 bg-slate-100 dark:text-gray-100"
+          className="w-12 p-[2px] xs:font-extralight md:font-medium xs:text-[10px] sx:text-sm h-full text-center rounded-md border-2 border-gray-300 dark:border-sky-500  bg-transparent font-sans text-sm font-normal outline outline-0 transition-all focus:placeholder-opacity-0 focus:border-customBlue focus:outline-0 text-slate-800 bg-slate-100 dark:text-gray-100"
         />
       </span>
       <select
-        className="w-24 p-[3px] h-full rounded-md border-2 border-gray-300 dark:border-sky-500 bg-transparent font-sans text-sm font-normal outline outline-0 transition-all focus:placeholder-opacity-0 focus:border-customBlue focus:outline-0 text-slate-800 bg-slate-100 dark:text-gray-100 dark:bg-sky-700"
+        className="w-24 p-[3px] xs:font-extralight md:font-medium xs:text-[10px] sx:text-sm h-full rounded-md border-2 border-gray-300 dark:border-sky-500 bg-transparent font-sans text-sm font-normal outline outline-0 transition-all focus:placeholder-opacity-0 focus:border-customBlue focus:outline-0 text-slate-800 bg-slate-100 dark:text-gray-100 dark:bg-sky-700"
         value={table.getState().pagination.pageSize}
         onChange={(e) => {
           table.setPageSize(Number(e.target.value));

@@ -10,7 +10,7 @@ import FormRowVertical from "../../ui/FormRowVertical";
 import { useTranslation } from "react-i18next";
 import { FaTree } from "react-icons/fa";
 import { RxCross1 } from "react-icons/rx";
-import { GiPositionMarker } from "react-icons/gi";
+import { GiDeer, GiPositionMarker } from "react-icons/gi";
 import { TbPoint } from "react-icons/tb";
 import { GiCow } from "react-icons/gi";
 import { LuTreeDeciduous } from "react-icons/lu";
@@ -274,17 +274,24 @@ const DrawModal: React.FC<ModalState> = ({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       className={`modal max-w-[280px] h-fit fixed inset-0 ${
-        isSidebarVisible ? "left-[320px]" : "left-[30px]"
-      } top-14 bg-slate-300 bg-opacity-90 dark:bg-opacity-60 hover:bg-opacity-75 z-50`}
+        isSidebarVisible ? "left-80" : "left-9"
+      } top-14 bg-slate-300 bg-opacity-90 dark:bg-opacity-60 hover:bg-opacity-75 z-50 pb-4`}
     >
       <div>
         <div className="modal-content flex flex-col">
           <div className="flex flex-row items-center justify-between dark:bg-gray-900 dark:bg-opacity-90 p-2 cursor-grab border-b-2">
-            <h6 className="text-left font-semibold text-blue-600">
+            <span className="bg-logo">
+              <GiDeer className="w-8 h-8 sm:w-8 sm:h-8" />
+            </span>
+            <h1
+              className="text-base text-gradient justify-center px-2 font-medium
+                                        sm:text-lg sm:font-medium 
+                                        md:text-xl md:font-medium"
+            >
               {t("drawModel:modal_title")}
-            </h6>
+            </h1>
             <button
-              className="bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white text-blue-600"
+              className="bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8  inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white text-blue-600"
               onClick={modalClose}
             >
               <svg
@@ -371,7 +378,7 @@ const DrawModal: React.FC<ModalState> = ({
           </div>
           {!isDrawingFeature && !isTextFeature && (
             <div onMouseDown={childElementMouseDownHandler} className="flex">
-              <span className="text-sm p-2 ml-auto">
+              <span className="xs:text-xs text-sm p-2 ml-auto">
                 {`${
                   drawingFeature
                     ? drawingFeature + " " + t("drawModel:txt_selected_feture")
@@ -385,7 +392,7 @@ const DrawModal: React.FC<ModalState> = ({
               onMouseDown={childElementMouseDownHandler}
               className="flex flex-wrap  justify-evenly"
             >
-              <div className="w-[100%] sx:w-1/2 flex  justify-evenly p-1 gap-[2px]">
+              <div className="w-[100%] xs:w-1/2 flex  justify-evenly p-1 gap-[2px]">
                 <FormRowVertical
                   label={t("drawModel:color")}
                   name="color"
@@ -401,7 +408,7 @@ const DrawModal: React.FC<ModalState> = ({
                 </FormRowVertical>
               </div>
               {!isPointer && (
-                <div className="w-[100%] sx:w-1/2 flex  justify-evenly p-1 gap-[2px]">
+                <div className="w-[100%] xs:w-1/2 flex  justify-evenly p-1 gap-[2px]">
                   <FormRowVertical
                     label={t("drawModel:font_size")}
                     name="color"
@@ -418,7 +425,7 @@ const DrawModal: React.FC<ModalState> = ({
                 </div>
               )}
               {isPointer && (
-                <div className="w-[100%] sx:w-1/2 flex  justify-evenly p-1 gap-[2px]">
+                <div className="w-[100%] xs:w-1/2 flex  justify-evenly p-1 gap-[2px]">
                   <FormRowVertical
                     label={t("drawModel:font_size")}
                     name="color"

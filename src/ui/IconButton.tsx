@@ -19,8 +19,8 @@ const IconButton: React.FC<IconButtonProps> = ({
   disabled,
   classes,
 }) => {
-  const baseClasses = `
-    flex items-center justify-center ${classes?.opacity}
+  const baseClasses = `xs:font-extralight md:font-medium xs:text-sm md:text-base lg:text-[1.25rem]
+    flex items-center justify-center ${classes?.opacity} 
     ${classes?.padding_x ?? "px-1"} py-0 
     border-none bg-none rounded-sm 
     transition-all transform duration-300

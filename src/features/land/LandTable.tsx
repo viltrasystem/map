@@ -191,15 +191,15 @@ const LandTable: React.FC<LandTableProps> = ({
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="border-collapse w-full">
+    <div className="overflow-auto border rounded-md shadow-md">
+      <table className="border-collapse w-full h-full overflow-auto">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className={`py-1 px-3 text-left text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm  ${
+                  className={`xs:py-[6px] xs:px-[2px] sx:py-2 md:px-3 md:py-2 font-sans xs:font-extralight md:font-medium xs:text-[9px] sx:text-[0.75rem] md:text-sm lg:text-base xs:text-center md:text-left text-slate-950 dark:text-blue-400   ${
                     headerColorMapping[
                       header.column.id as keyof typeof headerColorMapping
                     ] || "dark:bg-gray-900 bg-gray-300"
@@ -223,7 +223,7 @@ const LandTable: React.FC<LandTableProps> = ({
               return (
                 <tr
                   key={rowData.LandId}
-                  className="border-b-[1px] border-solid border-slate-400 cursor-pointer text-slate-950 hover:bg-red-300 bg-gray-200 dark:border-slate-300 text-sm"
+                  className="xs:py-[2px] xs:px-[2px] md:px-3 md:py-2 font-sans xs:font-extralight md:font-medium xs:text-[9px] sx:text-[0.75rem] md:text-sm xs:text-center md:text-left border-b-[1px] border-solid border-slate-400 cursor-pointer text-slate-950 hover:bg-red-300 bg-gray-200 dark:border-slate-300"
                   onClick={(e) => handleRowClick(row, e.currentTarget)}
                   onMouseEnter={() => handleMouseEnter(row)}
                   onMouseLeave={() => handleMouseLeave(row)}
@@ -243,7 +243,7 @@ const LandTable: React.FC<LandTableProps> = ({
             <tr className="bg-gray-50 dark:bg-gray-800">
               <td
                 colSpan={columns.length}
-                className="text-left text-sm py-3 px-6 text-gray-700 dark:text-gray-300"
+                className="text-left py-3 px-6 xs:font-extralight md:font-medium xs:text-[10px] sx:text-[0.75rem] md:text-sm text-gray-700 dark:text-gray-300"
               >
                 {t("landSummaryTable:no_data")}
               </td>

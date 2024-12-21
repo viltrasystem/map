@@ -186,19 +186,19 @@ const Resizable: React.FC<ResizableProps> = ({
           land.length > 0 || (landDetails && landDetails?.Lands.length > 0)
             ? "block"
             : "hidden"
-        } w-full h-6  pr-3  bg-gray-400 cursor-row-resize flex justify-end`}
+        } w-full h-6 pr-3 bg-sky-400 dark:bg-sky-500 cursor-row-resize flex justify-end`}
       >
         <div className="flex gap-2">
           <button
             ref={arrowDownRef}
-            className="text-2xl hover:text-white hover:rounded-full hover:border-1 hover:bg-blue-600 flex items-center justify-center"
+            className="text-2xl hover:text-white hover:rounded-full hover:border-1 hover:bg-sky-800 flex items-center justify-center"
             onClick={handleMinimizeButtonClick}
           >
             <MdOutlineKeyboardArrowDown />
           </button>
           <button
             ref={arrowUpRef}
-            className="text-2xl hover:text-white hover:rounded-full hover:border-1    hover:bg-blue-600"
+            className="text-2xl hover:text-white hover:rounded-full hover:border-1    hover:bg-sky-800"
             onClick={handleMaximizeButtonClick}
           >
             <MdOutlineKeyboardArrowUp />
@@ -212,7 +212,7 @@ const Resizable: React.FC<ResizableProps> = ({
           land.length > 0 || (landDetails && landDetails?.Lands.length > 0)
             ? "block"
             : "hidden"
-        } "bg-gray-200 overflow-y-scroll"`}
+        } "bg-gray-200 w-full h-full"`}
       >
         <LandTabs summaryType="land" onToggle={handleToggle} isMapView={true}>
           <Tab label="Unit Land" type="land">

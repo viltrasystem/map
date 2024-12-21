@@ -1,9 +1,8 @@
-import Heading from "../ui/Heading";
 import DarkModeToggle from "../ui/DarkModeToggle";
 import TranslationToggle from "../ui/TranslationToggle";
-import Logo from "../ui/Logo";
 import { useTranslation } from "react-i18next";
 import { TbError404 } from "react-icons/tb";
+import { GiDeer } from "react-icons/gi";
 
 const PageNotFound = () => {
   const { t } = useTranslation();
@@ -20,12 +19,17 @@ const PageNotFound = () => {
                   <TranslationToggle />
                 </div>
                 <div className="flex flex-col items-center gap-1 pt-6 text-center bg-logo">
-                  <Logo size={60} />
+                  <GiDeer className="w-10 h-10 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16" />
                   <div className="text-gradient">
-                    <Heading
-                      headingElement="h4"
-                      headingTxt={t("mapping:title")}
-                    />
+                    <h1
+                      className="text-base font-medium 
+                                        sm:text-lg sm:font-medium 
+                                        md:text-xl md:font-medium 
+                                        lg:text-2xl lg:font-medium
+                                        xl:text-2xl xl:font-medium"
+                    >
+                      {t("mapping:title")}
+                    </h1>
                   </div>
                 </div>
                 <div className="flex flex-row items-center justify-center gap-x-4   px-12">

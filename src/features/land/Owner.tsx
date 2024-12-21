@@ -13,7 +13,6 @@ import landApi, { OwnersState } from "../../services/landApi";
 import { OwnerDetailReq } from "../../slices/landOwnersSlice";
 import IconButton, { IconClasses } from "../../ui/IconButton";
 import { HiOutlineXMark } from "react-icons/hi2";
-import Heading from "../../ui/Heading";
 import FormRowHorizontal from "../../ui/FormRowHorizontal";
 import { useTranslation } from "react-i18next";
 import Input from "../../ui/Input";
@@ -23,6 +22,7 @@ import SpinnerMini from "../../ui/SpinnerMini";
 import { getToastOptions } from "../../lib/helpFunction";
 import { useDarkMode } from "../../context/DarkModeContext";
 import ConfirmToast from "../../ui/ConfirmToast";
+import { GiDeer } from "react-icons/gi";
 
 interface OwnerProps {
   ownerDetailReq: OwnerDetailReq;
@@ -341,22 +341,32 @@ export const Owner: React.FC<OwnerProps> = ({
   };
 
   return (
-    <main className="h-fit fixed inset-0 flex m-auto content-center justify-center items-center z-50">
+    <main className="h-fit fixed inset-0 -top-72 flex m-auto content-center justify-center items-center z-50">
       <section
         className="rounded-lg shadow-2xl max-w-md w-full transform transition-transform duration-300 ease-in-out animate-fadeIn"
         role="dialog"
         aria-modal="true"
       >
         <div className="gap-6 block h-full min-w-max flex-wrap items-start justify-center text-neutral-800 font-light rounded-lg  shadow-2xl  bg-neutral-100 dark:text-gray-200 dark:bg-slate-700">
-          <div className="flex justify-between items-center pt-3 px-3">
-            <div className="flex-1 flex justify-center font-serif">
-              <Heading headingElement="h4" headingTxt={t("owner:title")} />
-            </div>
-            <div className="h-1/2">
+          <div className="flex justify-between items-center pt-3 px-2">
+            <span className="bg-logo flex-shrink-0 pl-2">
+              <GiDeer className="w-8 h-8 sm:w-8 sm:h-8" />
+            </span>
+            <h1
+              className="text-base font-medium text-gradient 
+               sm:text-lg sm:font-medium 
+               md:text-xl md:font-medium 
+               lg:text-2xl lg:font-medium 
+               xl:text-2xl xl:font-medium 
+               text-center flex-grow"
+            >
+              {t("owner:title")}
+            </h1>
+            <span className="flex-shrink-0">
               <IconButton onClick={landOwnerModalClose} classes={iconClasses}>
                 <HiOutlineXMark size={20} width={10} />
               </IconButton>
-            </div>
+            </span>
           </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="p-4 md:p-6">

@@ -9,7 +9,6 @@ import {
 import { LiaDrawPolygonSolid } from "react-icons/lia";
 import { TbMapPlus } from "react-icons/tb";
 import IconButton from "./IconButton";
-import Logo from "./Logo";
 import RightSidePanel from "./RightSidePanel";
 import DrawModal from "../features/map/DrawModal";
 import { useAppDispatch, useAppSelector } from "../app/hook";
@@ -25,6 +24,8 @@ import { toast } from "react-toastify";
 import { getToastOptions, wordExistsInUri } from "../lib/helpFunction";
 import { useAppContext } from "../context/AppContext";
 import { setSelectedTab } from "../slices/tabSelectionSlice";
+import { fetchComplete } from "../slices/unitLandLayerSlice";
+import { GiDeer } from "react-icons/gi";
 
 interface HeaderProps {
   isFetchedUserUnits: boolean;
@@ -49,6 +50,7 @@ const Header: React.FC<HeaderProps> = ({ isFetchedUserUnits }) => {
   //const INTERVAL_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
   const openPanel = () => {
     setIsOpen(true);
+    dispatch(fetchComplete(false));
   };
 
   const searchBtnclickHandler: MouseEventHandler<
@@ -123,7 +125,7 @@ const Header: React.FC<HeaderProps> = ({ isFetchedUserUnits }) => {
       <div className="w-screen h-full flex  justify-between lg:gap-16 xl:gap-20">
         <div className="w-auto flex  justify-center gap-4 bg-logo">
           <span className="px-1 sm:px-3 py-1">
-            <Logo size={40} />
+            <GiDeer className="w-10 h-10 sm:w-10 sm:h-10" />
           </span>
           <span className="hidden lg:block self-center text-xl font-semibold whitespace-nowrap text-gradient">
             Viltrapporten Map
@@ -181,7 +183,7 @@ const Header: React.FC<HeaderProps> = ({ isFetchedUserUnits }) => {
           </div>
           <div>
             {/* Right side nav bar and panel */}
-            <div className="flex flex-1 me-12 items-center justify-end">
+            <div className="flex flex-1 me-2 items-center justify-end">
               <div className="hidden sm:flex flex-1 items-center justify-end">
                 <HeaderMenu isInsidePanel={false} />
               </div>

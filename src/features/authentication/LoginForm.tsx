@@ -12,11 +12,10 @@ import ErrorTxt from "../../ui/ErrorTxt";
 import { useAppDispatch, useAppSelector } from "../../app/hook";
 import { RootState } from "../../app/store";
 import { login } from "../../thunk/authThunk";
-import Heading from "../../ui/Heading";
-import Logo from "../../ui/Logo";
 import { useLocation, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { getToastOptions, isEmpty } from "../../lib/helpFunction";
+import { GiDeer } from "react-icons/gi";
 
 const LoginForm: React.FC = () => {
   const {
@@ -111,21 +110,28 @@ const LoginForm: React.FC = () => {
                   <div className="px-4 sm:px-0 md:w-6/12">
                     <div className="sm:mx-6 sm:p-12 sm:pt-4 p-4 h-8/12 sm:h-full">
                       <div className="flex gap-1 flex-col items-center text-center bg-logo">
-                        <Logo size={100} />
-                        <div className="text-gradient mb-4">
-                          <Heading
-                            headingElement="h4"
-                            headingTxt="Viltrapporten Map"
-                          />
+                        <GiDeer className="w-10 h-10 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16" />
+                        <div className="text-gradient mb-2 md:4">
+                          <h1
+                            className="text-base font-medium 
+                                        sm:text-lg sm:font-medium 
+                                        md:text-xl md:font-medium 
+                                        lg:text-2xl lg:font-medium
+                                        xl:text-2xl xl:font-medium"
+                          >
+                            Viltrapporten Map
+                          </h1>
                         </div>
                       </div>
                       <>
                         <form
-                          className="mt-6"
+                          className="mt-2 md:mt-4"
                           onSubmit={handleSubmit(onSubmit)}
                           noValidate
                         >
-                          <p className="pb-4">Please login to your account</p>
+                          <p className="pb-4 text-xs xs:text-sm  md:text-base font-medium">
+                            Please login to your account
+                          </p>
                           <div>
                             {isEmpty(errors) &&
                               error &&
@@ -140,15 +146,15 @@ const LoginForm: React.FC = () => {
                             error=""
                             name="username"
                             errorClasses=""
-                            labelClasses={labelClasses}
+                            labelClasses={`${labelClasses} text-xs sm:text-sm`}
                           >
                             <Input
                               id="username"
                               name="username"
                               type="text"
-                              className={`${inputClasses} ${
+                              className={`${inputClasses} xs:text-[0.75rem] sm:text-sm ${
                                 errors.username?.message && "border-rose-400"
-                              }  ${!errors.username && "border-customBlue"} `}
+                              }  ${!errors.username && "border-customBlue"}`}
                               placeholder="User Name"
                               register={register}
                               disabled={isLoading}
@@ -165,13 +171,13 @@ const LoginForm: React.FC = () => {
                             error=""
                             name="password"
                             errorClasses=""
-                            labelClasses={labelClasses}
+                            labelClasses={`${labelClasses} text-xs sm:text-sm`}
                           >
                             <Input
                               id="password"
                               name="password"
                               type="password"
-                              className={`${inputClasses} ${
+                              className={`${inputClasses}  xs:text-[0.75rem] sm:text-sm ${
                                 errors.password?.message && "border-rose-400"
                               }  ${!errors.password && "border-customBlue"} `}
                               placeholder="Password"
@@ -204,10 +210,16 @@ const LoginForm: React.FC = () => {
                   </div>
                   <div className="flex items-center rounded-b-lg md:w-6/12 md:rounded-r-lg md:rounded-bl-none background-gradient">
                     <div className="px-3 py-6 text-white sm:mx-6 sm:p-8">
-                      <h4 className="mb-6 text-xl font-semibold">
+                      <h4
+                        className="mb-6  text-base font-medium 
+                                        sm:text-lg sm:font-medium 
+                                        md:text-xl md:font-medium 
+                                        lg:text-2xl lg:font-medium
+                                        xl:text-2xl xl:font-medium"
+                      >
                         Observation/Hunting lands & statistics
                       </h4>
-                      <p className="text-sm">
+                      <p className="text-xs sm:text-sm text-justify">
                         Lorem ipsum dolor sit amet, consectetur adipisicing
                         elit, sed do eiusmod te Lorem ipsum dolor sit amet
                         consectetur adipisicing elit. Optio corrupti tenetur

@@ -7,6 +7,12 @@ const UnitList: React.FC = () => {
   const { user } = useAppSelector((state: RootState) => state.auth);
   const { selectedRootUnitId, error } = useAppSelector((state) => state.tree);
   const { userUnitList } = useAppSelector((state) => state.userUnit);
+  const { status } = useAppSelector(
+    (state: RootState) => ({
+      status: state.unitLandLayer.status,
+    }),
+    (prev, next) => prev.status === next.status
+  );
 
   const dispatch = useAppDispatch();
 
@@ -21,11 +27,14 @@ const UnitList: React.FC = () => {
   return (
     <div>
       <select
-        className="appearance-none bg-white dark:bg-gray-800 border p-[8px] divide-y divide-gray-200 border-gray-300 dark:border-gray-600 
+        className={`appearance-none bg-white dark:bg-gray-800 border p-[8px] divide-y divide-gray-200 border-gray-300 dark:border-gray-600 
         text-[14px] text-gray-700 dark:text-white block w-full rounded  focus:outline-none focus:border-blue-500 focus:shadow-outline-blue focus:ring focus:ring-blue-200
-         dark:focus:border-blue-500 dark:focus:shadow-outline-blue dark:focus:ring dark:focus:ring-blue-200 transition duration-300"
+         dark:focus:border-blue-500 dark:focus:shadow-outline-blue dark:focus:ring dark:focus:ring-blue-200 transition duration-300 ${
+           status === "loading" ? "opacity-75 pointer-events-none" : ""
+         }`}
         value={selectedRootUnitId}
         onChange={(e) => handleSelectUnit(parseInt(e.target.value))}
+        disabled={status === "loading"}
       >
         <option
           value={0}

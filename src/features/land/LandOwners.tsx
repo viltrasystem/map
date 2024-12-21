@@ -484,7 +484,7 @@ const LandOwners = () => {
                       <th
                         key={header.id}
                         onClick={header.column.getToggleSortingHandler()}
-                        className={`py-1 px-1 text-left text-gray-800 dark:text-gray-200 font-sans text-sm border-[0.5px] border-slate-300 dark:border-slate-500   ${
+                        className={`xs:py-[2px] xs:px-[2px] md:px-3 md:py-2 font-sans xs:font-extralight md:font-medium xs:text-[9px] sx:text-[0.75rem] md:text-sm lg:text-base xs:text-center md:text-left text-gray-800 dark:text-gray-200 border-[0.5px] border-slate-300 dark:border-slate-500   ${
                           headerColorMapping[header.column.id as headerType] ||
                           "bg-slate-200 dark:bg-slate-600"
                         }`}
@@ -556,13 +556,13 @@ const LandOwners = () => {
                 {table.getRowModel().rows.length > 0 ? (
                   table.getRowModel().rows.map((row) => (
                     <React.Fragment key={row.id}>
-                      <tr className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-sky-100 dark:hover:bg-sky-800">
+                      <tr className="xs:py-[2px] xs:px-[2px] md:px-3 md:py-2 font-sans xs:font-extralight md:font-medium xs:text-[9px] sx:text-[0.75rem] md:text-sm xs:text-center md:text-left bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-sky-100 dark:hover:bg-sky-800">
                         {row.getVisibleCells().map((cell) => (
                           <td
                             key={cell.id}
                             className={`py-1 ${
                               cell.column.id === "LandId" ? "px-1" : "px-2"
-                            }  font-extralight text-sm text-gray-700 dark:text-gray-300`}
+                            }  text-gray-700 dark:text-gray-300`}
                           >
                             {cell.column.id === "LandId" ? (
                               <span
@@ -603,38 +603,38 @@ const LandOwners = () => {
                           >
                             <table className="border-collapse  w-full">
                               <thead
-                                className="text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm
+                                className="xs:py-[2px] xs:px-[2px] md:px-3 md:py-2 font-sans xs:font-extralight md:font-medium xs:text-[9px] sx:text-[0.75rem] md:text-sm md:text-left text-slate-950 dark:text-blue-400
                                  bg-gray-400 dark:bg-gray-600"
                               >
                                 <tr>
-                                  <th className="py-1 px-1text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm"></th>
-                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700"></th>
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700">
                                     {t("landOwnersTable:municipality")}
                                   </th>
-                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700">
                                     {t("landOwnersTable:main_no")}
                                   </th>
-                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700">
                                     {" "}
                                     {t("landOwnersTable:sub_no")}
                                   </th>
-                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700">
                                     {t("landOwnersTable:unit")}
                                   </th>
-                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700">
                                     {" "}
                                     {t("landOwnersTable:area_in_forest")}
                                   </th>
-                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700">
                                     {t("landOwnersTable:area_in_mountain")}
                                   </th>
-                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700">
                                     {t("landOwnersTable:area_in_agriculture")}
                                   </th>
-                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700">
                                     {t("landOwnersTable:total_area")}
                                   </th>
-                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 font-sans bg-gray-200 dark:bg-gray-700 text-sm">
+                                  <th className="py-1 px-1 text-left  text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-700">
                                     {t("landOwnersTable:map")}
                                   </th>
                                 </tr>
@@ -643,8 +643,8 @@ const LandOwners = () => {
                                 {row.original.SubRows?.map(
                                   (subRow, subRowIndex) => (
                                     <React.Fragment key={subRow.LandId}>
-                                      <tr className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-sky-200 dark:hover:bg-sky-600">
-                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300 max-w-min">
+                                      <tr className="xs:py-[2px] xs:px-[2px] md:px-3 md:py-2 font-sans xs:font-extralight md:font-medium xs:text-[9px] sx:text-[0.75rem] md:text-sm md:text-left bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-sky-200 dark:hover:bg-sky-600">
+                                        <td className="py-1 px-1 text-gray-700 dark:text-gray-300 max-w-min">
                                           <span
                                             onClick={() =>
                                               handleSubRowExpand(
@@ -667,31 +667,31 @@ const LandOwners = () => {
                                             )}
                                           </span>
                                         </td>
-                                        <td className="py-1 1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                        <td className="py-1 px-1 text-gray-700 dark:text-gray-300">
                                           {subRow.Municipality}
                                         </td>
-                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                        <td className="py-1 px-1 text-gray-700 dark:text-gray-300">
                                           {subRow.MainNo}
                                         </td>
-                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                        <td className="py-1 px-1 text-gray-700 dark:text-gray-300">
                                           {subRow.SubNo}
                                         </td>
-                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                        <td className="py-1 px-1 text-gray-700 dark:text-gray-300">
                                           {subRow.LandUnit}
                                         </td>
-                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                        <td className="py-1 px-1 text-gray-700 dark:text-gray-300">
                                           {subRow.AreaInForest}
                                         </td>
-                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                        <td className="py-1 px-1 text-gray-700 dark:text-gray-300">
                                           {subRow.AreaInMountain}
                                         </td>
-                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                        <td className="py-1 px-1 text-gray-700 dark:text-gray-300">
                                           {subRow.AreaInAgriculture}
                                         </td>
-                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                        <td className="py-1 px-1 text-gray-700 dark:text-gray-300">
                                           {subRow.TotalArea}
                                         </td>
-                                        <td className="py-1 px-1 font-extralight text-sm text-gray-700 dark:text-gray-300">
+                                        <td className="py-1 px-1 text-gray-700 dark:text-gray-300">
                                           <button
                                             onClick={() =>
                                               handleMapView(subRow)
@@ -724,7 +724,7 @@ const LandOwners = () => {
                   <tr className="bg-gray-50 dark:bg-gray-800">
                     <td
                       colSpan={columns.length}
-                      className="text-left text-sm py-3 px-6 text-gray-700 dark:text-gray-300"
+                      className="text-left py-3 px-6 xs:font-extralight md:font-medium xs:text-[10px] sx:text-[0.75rem] md:text-sm text-gray-700 dark:text-gray-300"
                     >
                       {t("landOwnersTable:no_data")}
                     </td>
@@ -737,7 +737,7 @@ const LandOwners = () => {
                     {footerGroup.headers.map((header) => (
                       <td
                         key={header.id}
-                        className="py-1 px-3 text-left text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm bg-gray-400 dark:bg-gray-600"
+                        className="py-1 px-3 xs:font-extralight md:font-medium xs:text-[10px] sx:text-[0.80rem] md:text-sm lg:text-base xs:text-center md:text-left text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm bg-gray-400 dark:bg-gray-600"
                       >
                         {header.isPlaceholder
                           ? null

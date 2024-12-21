@@ -50,7 +50,7 @@ const HeaderMenu: React.FC<LogoutProps> = ({ isInsidePanel }) => {
     <div>
       {isInsidePanel && (
         <div
-          className="me-1 px-3 py-1 w-[95%] inline-flex items-center font-normal text-sm bg-none border-none  text-gray-600 dark:text-gray-300 dark:hover:text-gray-900 hover:text-gray-900 rounded-sm hover:bg-slate-300 active:bg-slate-200 hover:ring-0 hover:ring-slate-100 cursor-pointer"
+          className="me-1 px-1 py-1 w-[95%] inline-flex items-center font-normal text-sm bg-none border-none  text-gray-600 dark:text-gray-300 dark:hover:text-gray-900 hover:text-gray-900 rounded-sm hover:bg-slate-300 active:bg-slate-200 hover:ring-0 hover:ring-slate-100 cursor-pointer"
           onClick={logoutHandler}
         >
           {!isLoading ? <HiOutlineLogout size={20} /> : <SpinnerMini />}

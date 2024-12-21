@@ -81,14 +81,15 @@ export const getToastOptions = (): ToastOptions => {
     draggable: true,
     style: {
       fontSize: "12px",
-      width: "600px",
-      padding: "4px 6px",
+      width: "400px",
+      padding: "6px 6px",
       fontWeight: "500",
       minHeight: "30px",
-      lineHeight: "0.7",
+      lineHeight: "1.5",
       //backgroundColor: "black",
       //color: "white",
       transform: "translate(-50%, -50%)",
+      top: "10px",
     },
     progress: undefined, // Custom progress bar value (0 to 1)
     // type: "default", // Type of toast: 'info', 'success', 'warning', 'error', 'default' **

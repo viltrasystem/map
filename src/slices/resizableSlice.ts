@@ -2,9 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface ResizableState {
   bottomPaneHeight: number;
+  isAtTop: boolean;
 }
 const initialState: ResizableState = {
   bottomPaneHeight: 0,
+  isAtTop: false,
 };
 
 const resizableSlice = createSlice({
@@ -13,6 +15,7 @@ const resizableSlice = createSlice({
   reducers: {
     setHeightState: (state, action: PayloadAction<number>) => {
       state.bottomPaneHeight = action.payload;
+      state.isAtTop = action.payload > 95;
     },
   },
 });

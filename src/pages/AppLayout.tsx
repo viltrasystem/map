@@ -22,7 +22,12 @@ const AppLayout = () => {
     (state: RootState) => ({ rootId: state.mapping.rootId }),
     (prev, next) => prev.rootId === next.rootId
   );
-
+  const { isAtTop } = useAppSelector(
+    (state: RootState) => ({
+      isAtTop: state.resize.isAtTop,
+    }),
+    (prev, next) => prev.isAtTop === next.isAtTop
+  );
   const { t } = useTranslation();
   const [IsUserUnitAvailable, setIsUserUnitAvailable] = useState(true);
   const sidebarRef = useRef<HTMLDivElement | null>(null);
@@ -163,6 +168,7 @@ const AppLayout = () => {
 `;
         sidebarVisible.current = true;
         isSidebarShowRef.current = true;
+        dispatch(setSideBarVisibility(true));
       } else {
         sidebar.style.gridTemplateColumns = "0 1fr";
         button.innerHTML = `<svg class="" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -171,6 +177,7 @@ const AppLayout = () => {
 `;
         sidebarVisible.current = false;
         isSidebarShowRef.current = false;
+        dispatch(setSideBarVisibility(false));
       }
     }
   };
@@ -252,10 +259,14 @@ const AppLayout = () => {
             />
           </div>
           <div className="flex relative">
-            <div className="absolute top-[1px] left-[6px]  z-10">
+            <div className="absolute top-[1px] left-[6px] z-10">
               <button
-                className="rounded-full p-[4px] w-8 h-8 flex items-center justify-center text-gray-800  hover:text-gray-100 hover:bg-gray-400  hover:ring-gray-600
-        dark:text-tblColora  dark:hover:text-gray-800 dark:hover:bg-gray-400 dark:focus:ring-gray-800  dark:hover:ring-gray-600  transition duration-300"
+                className={`rounded-lg ${
+                  isAtTop
+                    ? "-mt-[2px] w-7 h-7 hover:text-white hover:bg-sky-800"
+                    : "w-8 h-8  text-gray-800 dark:text-gray-800 hover:text-gray-100 dark:hover:text-gray-100 hover:bg-gray-400 dark:hover:bg-gray-600"
+                } flex items-center justify-center hover:border-1
+         transition duration-300`}
                 ref={buttonRef}
                 onClick={toggleSidebarVisibility}
               ></button>

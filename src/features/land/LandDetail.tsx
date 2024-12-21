@@ -271,7 +271,7 @@ const LandDetail: React.FC<ToggleStateProps> = ({
           <button
             onClick={() => showConfirmationToast(row.original)}
             className="
-        flex items-center justify-center px-2 py-1
+        flex px-2 py-1
         rounded-lg font-medium text-sm transition-all
         focus:outline-none
         focus:ring-red-400
@@ -470,7 +470,7 @@ const LandDetail: React.FC<ToggleStateProps> = ({
                     <th
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}
-                      className={`py-1 px-1 border-[0.5px] border-slate-300 dark:border-slate-500 text-left text-gray-800 dark:text-gray-200 font-sans text-sm  ${
+                      className={`xs:py-[2px] xs:px-[2px] md:px-3 md:py-2 font-sans xs:font-extralight md:font-medium xs:text-[9px] sx:text-[0.75rem] md:text-sm lg:text-base xs:text-center md:text-left border-[0.5px] border-slate-300 dark:border-slate-500 text-gray-800 dark:text-gray-200 ${
                         headerColorMapping[
                           header.column.id as headerColorMappingType
                         ] || "bg-slate-200 dark:bg-slate-600"
@@ -488,7 +488,7 @@ const LandDetail: React.FC<ToggleStateProps> = ({
                                 {header.column.getIsSorted() === "desc" ? (
                                   <IconButton classes={iconClasses}>
                                     <LiaSortAmountDownSolid
-                                      size={20}
+                                      // size={20}
                                       className={`${
                                         headerColorMapping[
                                           header.column
@@ -502,7 +502,7 @@ const LandDetail: React.FC<ToggleStateProps> = ({
                                 ) : (
                                   <IconButton classes={iconClasses}>
                                     <LiaSortAmountDownAltSolid
-                                      size={20}
+                                      // size={20}
                                       className={`${
                                         headerColorMapping[
                                           header.column
@@ -519,7 +519,7 @@ const LandDetail: React.FC<ToggleStateProps> = ({
                               <span className="ml-1">
                                 <IconButton classes={iconClasses}>
                                   <LiaSortSolid
-                                    size={20}
+                                    // size={20}
                                     className={`${
                                       headerColorMapping[
                                         header.column
@@ -546,13 +546,13 @@ const LandDetail: React.FC<ToggleStateProps> = ({
               {table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map((row) => (
                   <React.Fragment key={row.id}>
-                    <tr className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-sky-100 dark:hover:bg-sky-800">
+                    <tr className="xs:py-[2px] xs:px-[2px] md:px-3 md:py-2 font-sans xs:font-extralight md:font-medium xs:text-[9px] sx:text-[0.75rem] md:text-sm xs:text-center md:text-left bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 hover:bg-sky-100 dark:hover:bg-sky-800">
                       {row.getVisibleCells().map((cell) => (
                         <td
                           key={cell.id}
                           className={`py-1 ${
                             cell.column.id === "LandId" ? "px-1" : "px-2"
-                          }  font-extralight text-sm text-gray-700 dark:text-gray-300`}
+                          } text-gray-700 dark:text-gray-300`}
                         >
                           {cell.column.id === "LandId" ? (
                             <span
@@ -594,7 +594,7 @@ const LandDetail: React.FC<ToggleStateProps> = ({
                 <tr className="bg-gray-50 dark:bg-gray-800">
                   <td
                     colSpan={columns.length}
-                    className="text-left text-sm py-3 px-6 text-gray-700 dark:text-gray-300"
+                    className="text-left py-3 px-6 xs:font-extralight md:font-medium xs:text-[10px] sx:text-[0.75rem] md:text-sm text-gray-700 dark:text-gray-300"
                   >
                     {t("landSummaryTable:no_data")}
                   </td>
@@ -607,7 +607,7 @@ const LandDetail: React.FC<ToggleStateProps> = ({
                   {footerGroup.headers.map((header) => (
                     <td
                       key={header.id}
-                      className="py-1 px-3 text-left text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm bg-gray-400 dark:bg-gray-600"
+                      className="py-1 px-3 xs:font-extralight md:font-medium xs:text-[10px] sx:text-[0.80rem] md:text-sm lg:text-base xs:text-center md:text-left text-slate-950 dark:text-blue-400 font-sans font-extralight text-sm bg-gray-400 dark:bg-gray-600"
                     >
                       {header.isPlaceholder
                         ? null

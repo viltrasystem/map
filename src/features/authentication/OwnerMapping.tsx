@@ -4,13 +4,12 @@ import { useAppDispatch, useAppSelector } from "../../app/hook";
 import { RootState, persistor } from "../../app/store";
 import DarkModeToggle from "../../ui/DarkModeToggle";
 import TranslationToggle from "../../ui/TranslationToggle";
-import Logo from "../../ui/Logo";
-import Heading from "../../ui/Heading";
 import { useTranslation } from "react-i18next";
 import { logout } from "../../thunk/authThunk";
 import { LogoutRequest } from "../../lib/types";
 import { setLandMapping, MappingState } from "../../slices/landMappingSlice";
 import { setLoadingState } from "../../slices/loadingSlice";
+import { GiDeer } from "react-icons/gi";
 
 const OwnerMapping = () => {
   const navigate = useNavigate();
@@ -92,12 +91,17 @@ const OwnerMapping = () => {
                   <TranslationToggle />
                 </div>
                 <div className="flex flex-col items-center gap-1 pt-6 text-center bg-logo">
-                  <Logo size={60} />
+                  <GiDeer className="w-10 h-10 sm:w-10 sm:h-10 md:w-11 md:h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16" />
                   <div className="text-gradient">
-                    <Heading
-                      headingElement="h4"
-                      headingTxt={t("mapping:title")}
-                    />
+                    <h1
+                      className="text-base font-medium 
+                                        sm:text-lg sm:font-medium 
+                                        md:text-xl md:font-medium 
+                                        lg:text-2xl lg:font-medium
+                                        xl:text-2xl xl:font-medium"
+                    >
+                      {t("mapping:title")}
+                    </h1>
                   </div>
                 </div>
                 {isValid ? (
